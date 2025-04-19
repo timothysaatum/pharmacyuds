@@ -1,0 +1,289 @@
+{% extends 'election/base.html' %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h1 class="page-title">
+            <i class="fas fa-chart-line me-2"></i>Live Results
+        </h1>
+        <div>
+            <span class="badge bg-success" id="live-indicator">
+                <i class="fas fa-circle me-1"></i> LIVE
+            </span>
+            <small class="text-muted ms-2" id="last-updated"></small>
+        </div>
+    </div>
+</div>
+
+<div id="results-container">
+    <!-- Results will be loaded here -->
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 text-muted">Loading results...</p>
+    </div>
+</div>
+
+<!-- Template for portfolio results (used by JavaScript) -->
+<template id="portfolio-template">
+    <div class="row mb-4">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-trophy me-2"></i>
+                        <span class="portfolio-name"></span>
+                    </h4>
+                    <small class="text-white-50">Total votes: <span class="total-votes"></span></small>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush aspirants-list">
+                        <!-- Aspirants will be inserted here -->
+                    </ul>
+                </div>
+                <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        <i class="fas fa-sync-alt me-1"></i>
+                        Results automatically update every minute
+                    </small>
+                    <span class="badge bg-light text-dark">
+                        <i class="fas fa-users me-1"></i> <span class="candidate-count"></span> Candidates
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Template for an aspirant result item (used by JavaScript) -->
+<template id="aspirant-template">
+    <li class="list-group-item d-flex justify-content-between align-items-center p-3 aspirant-item">
+        <div class="d-flex align-items-center">
+            <div class="position-relative candidate-image-container me-3">
+                <!-- Rank badge will be added here for top candidates -->
+            </div>
+            <div>
+                <h5 class="mb-0 fw-bold candidate-name"></h5>
+                <small class="text-muted candidate-rank"></small>
+            </div>
+        </div>
+        <div class="d-flex flex-column align-items-end">
+            <div class="d-flex align-items-center">
+                <h4 class="mb-0 me-2 fw-bold vote-count"></h4>
+                <span class="badge vote-percentage"></span>
+            </div>
+            <div class="progress mt-2 vote-progress" style="height: 8px; width: 120px;">
+                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+    </li>
+</template>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const resultsContainer = document.getElementById('results-container');
+        const lastUpdatedEl = document.getElementById('last-updated');
+        const portfolioTemplate = document.getElementById('portfolio-template');
+        const aspirantTemplate = document.getElementById('aspirant-template');
+        const liveIndicator = document.getElementById('live-indicator');
+        
+        let updateInterval;
+        let lastData = null;
+        
+        // Function to format date
+        function formatDateTime(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        
+        // Create rank badge for top candidates
+        function createRankBadge(rank) {
+            const badge = document.createElement('span');
+            badge.className = 'position-absolute top-0 start-0 translate-middle badge rounded-pill';
+            
+            if (rank === 1) {
+                badge.className += ' bg-warning';
+                badge.innerHTML = '<i class="fas fa-crown"></i>';
+            } else if (rank === 2) {
+                badge.className += ' bg-secondary';
+                badge.innerHTML = '2';
+            } else if (rank === 3) {
+                badge.className += ' bg-info';
+                badge.innerHTML = '3';
+            }
+            
+            return badge;
+        }
+        
+        // Create candidate image or placeholder
+        function createCandidateImage(imageUrl, candidateName, rank) {
+            if (imageUrl) {
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = candidateName;
+                img.className = 'rounded-circle';
+                img.style = 'width: 60px; height: 60px; object-fit: cover;';
+                return img;
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'rounded-circle bg-secondary d-flex align-items-center justify-content-center';
+                placeholder.style = 'width: 60px; height: 60px;';
+                
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-user text-white fs-4';
+                placeholder.appendChild(icon);
+                
+                return placeholder;
+            }
+        }
+        
+        // Function to render a single aspirant
+        function renderAspirant(aspirant, rank, total) {
+            const template = aspirantTemplate.content.cloneNode(true);
+            const item = template.querySelector('.aspirant-item');
+            
+            // Set aspirant name and rank
+            item.querySelector('.candidate-name').textContent = aspirant.name;
+            item.querySelector('.candidate-rank').textContent = `Candidate #${rank}`;
+            
+            // Set vote count and percentage
+            item.querySelector('.vote-count').textContent = aspirant.votes;
+            
+            const percentageEl = item.querySelector('.vote-percentage');
+            percentageEl.textContent = `${aspirant.percentage}%`;
+            percentageEl.className = `badge ${rank === 1 ? 'bg-primary' : 'bg-secondary'}`;
+            
+            // Set progress bar
+            const progressBar = item.querySelector('.progress-bar');
+            progressBar.style.width = `${aspirant.percentage}%`;
+            progressBar.className = `progress-bar ${rank === 1 ? 'bg-primary' : 'bg-secondary'}`;
+            
+            // Add aspirant image or placeholder
+            const imageContainer = item.querySelector('.candidate-image-container');
+            const image = createCandidateImage(aspirant.image_url, aspirant.name, rank);
+            imageContainer.appendChild(image);
+            
+            // Add rank badge for top 3
+            if (rank <= 3) {
+                const badge = createRankBadge(rank);
+                imageContainer.appendChild(badge);
+            }
+            
+            // Highlight winner if needed
+            if (rank === 1) {
+                item.querySelector('.vote-count').classList.add('text-primary');
+            }
+            
+            return item;
+        }
+        
+        // Function to render a portfolio and its aspirants
+        function renderPortfolio(portfolio) {
+            const template = portfolioTemplate.content.cloneNode(true);
+            
+            // Set portfolio name and total votes
+            template.querySelector('.portfolio-name').textContent = portfolio.name;
+            template.querySelector('.total-votes').textContent = portfolio.total_votes;
+            template.querySelector('.candidate-count').textContent = portfolio.aspirants.length;
+            
+            // Add aspirants
+            const aspirantsList = template.querySelector('.aspirants-list');
+            
+            if (portfolio.aspirants.length === 0) {
+                const emptyItem = document.createElement('li');
+                emptyItem.className = 'list-group-item text-center p-4';
+                emptyItem.innerHTML = '<i class="fas fa-info-circle me-2 text-info"></i> No candidates available for this position yet.';
+                aspirantsList.appendChild(emptyItem);
+            } else {
+                portfolio.aspirants.forEach((aspirant, index) => {
+                    const aspirantEl = renderAspirant(aspirant, index + 1, portfolio.total_votes);
+                    aspirantsList.appendChild(aspirantEl);
+                });
+            }
+            
+            return template;
+        }
+        
+        // Function to render all results
+        function renderResults(data) {
+            lastData = data;
+            resultsContainer.innerHTML = '';
+            
+            if (data.results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                        <h4>No election data available yet</h4>
+                        <p class="text-muted">Check back soon for results</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            data.results.forEach(portfolio => {
+                resultsContainer.appendChild(renderPortfolio(portfolio));
+            });
+            
+            // Update last updated time
+            lastUpdatedEl.textContent = `Updated at ${formatDateTime(data.last_updated)}`;
+            
+            // Pulse animation for live indicator
+            liveIndicator.classList.add('pulse');
+            setTimeout(() => {
+                liveIndicator.classList.remove('pulse');
+            }, 1000);
+        }
+        
+        // Function to fetch results
+        function fetchResults() {
+            fetch('/api/live-results/')
+                .then(response => response.json())
+                .then(data => {
+                    renderResults(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching results:', error);
+                    
+                    // If we have previous data, continue showing it
+                    if (lastData) {
+                        renderResults(lastData);
+                    } else {
+                        resultsContainer.innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Error loading results. Please try again later.
+                            </div>
+                        `;
+                    }
+                    
+                    // Change live indicator to show offline status
+                    liveIndicator.className = 'badge bg-danger';
+                    liveIndicator.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i> OFFLINE';
+                });
+        }
+        
+        // Fetch results immediately and then every 60 seconds
+        fetchResults();
+        updateInterval = setInterval(fetchResults, 60000);
+        
+        // Clean up interval when leaving page
+        window.addEventListener('beforeunload', () => {
+            clearInterval(updateInterval);
+        });
+        
+        // Add pulse animation for live indicator
+        const styleEl = document.createElement('style');
+        styleEl.textContent = `
+            @keyframes pulse {
+                0% { opacity: 1; }
+                50% { opacity: 0.5; }
+                100% { opacity: 1; }
+            }
+            .pulse {
+                animation: pulse 1s;
+            }
+        `;
+        document.head.appendChild(styleEl);
+    });
+</script>
+{% endblock %}

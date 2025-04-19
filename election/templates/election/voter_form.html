@@ -1,0 +1,139 @@
+{% extends 'election/base.html' %}
+{% load form_tags %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-5 col-md-8">
+        <div class="text-center mb-4">
+            <h1 class="page-title">
+                <i class="fas fa-user-check me-2"></i>Voter Verification
+            </h1>
+            <p class="text-muted">Please verify your identity before proceeding to vote</p>
+        </div>
+        
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0 text-center">
+                    <i class="fas fa-id-card me-2"></i>Student Verification
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <form method="post" novalidate class="needs-validation">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <div class="form-floating">
+                            {{ form.class_group|add_class:"form-select" }}
+                            <label for="{{ form.class_group.id_for_label }}">
+                                <i class="fas fa-users me-1"></i>Class Group
+                            </label>
+                        </div>
+                        {% if form.class_group.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.class_group.errors %}
+                                    <p class="mb-0">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>Select your current class group
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-floating">
+                            {{ form.matric_number|add_class:"form-control" }}
+                            <label for="{{ form.matric_number.id_for_label }}">
+                                <i class="fas fa-id-badge me-1"></i>Matric Number
+                            </label>
+                        </div>
+                        {% if form.matric_number.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.matric_number.errors %}
+                                    <p class="mb-0">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>Enter your university matriculation number
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button id="submitBtn" type="submit" class="btn btn-primary btn-lg" disabled>
+                            <span id="spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                            <i class="fas fa-arrow-right me-2"></i>Verify & Proceed to Vote
+                        </button>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <p class="text-muted">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            Your information is securely encrypted
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="/" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector("form");
+        const submitBtn = document.getElementById("submitBtn");
+        const spinner = document.getElementById("spinner");
+        const matricField = document.getElementById("{{ form.matric_number.id_for_label }}");
+        const classField = document.getElementById("{{ form.class_group.id_for_label }}");
+        
+        // Visualize form field focus states
+        const formFields = document.querySelectorAll('.form-control, .form-select');
+        formFields.forEach(field => {
+            field.addEventListener('focus', () => {
+                field.parentElement.classList.add('focus-within');
+            });
+            field.addEventListener('blur', () => {
+                field.parentElement.classList.remove('focus-within');
+            });
+        });
+
+        // Enable submit button when both fields have values
+        function checkFormValidity() {
+            if (matricField.value.trim() !== '' && classField.value !== '') {
+                submitBtn.removeAttribute("disabled");
+            } else {
+                submitBtn.setAttribute("disabled", true);
+            }
+        }
+        
+        matricField.addEventListener('input', checkFormValidity);
+        classField.addEventListener('change', checkFormValidity);
+        
+        // Initial check on page load
+        checkFormValidity();
+
+        // Handle form submission
+        if (form) {
+            form.addEventListener("submit", () => {
+                submitBtn.setAttribute("disabled", true);
+                spinner.classList.remove("d-none");
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,60 @@
+/* Background for the form */
+body {
+    background-color: #f8f9fa;
+}
+
+/* Card layout */
+.card {
+    border-radius: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Card header - Aspirant position */
+.card-header {
+    background-color: #f1f1f1;
+    color: #333;
+}
+
+.card-header h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+/* Floating labels */
+.form-floating label {
+    font-size: 1rem;  /* Slightly larger for better visibility */
+    font-weight: 600;   /* Bolder labels */
+    color: #0056b3;     /* Primary color */
+}
+
+/* Button styling */
+button.btn-success {
+    font-size: 1.1rem;
+    font-weight: bold;
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+button.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+/* For aspirant images */
+img.img-fluid.rounded-circle {
+    max-width: 150px;
+    height: auto;
+    object-fit: cover;
+}
+
+/* Card body */
+.card-body {
+    text-align: center;
+}
+
+/* Ensuring form fields look great on mobile and tablet */
+@media (max-width: 768px) {
+    .col-md-6 {
+        width: 100%;
+    }
+}

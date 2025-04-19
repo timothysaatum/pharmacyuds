@@ -1,0 +1,10 @@
+<!-- templates/widgets/aspirant_option.html -->
+<div class="form-check">
+  <input type="radio" name="{{ name }}" value="{{ value }}" {% include "django/forms/widgets/attrs.html" %} class="form-check-input">
+  <label class="form-check-label">
+      {% if choice_instance.image %}
+          <img src="{{ choice_instance.image.url }}" alt="{{ choice_label }}" style="width: 50px; height: 50px; margin-right: 10px;">
+      {% endif %}
+      {{ choice_label }}
+  </label>
+</div>

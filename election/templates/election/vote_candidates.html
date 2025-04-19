@@ -1,0 +1,141 @@
+{% extends 'election/base.html' %}
+{% load form_tags %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="page-title">
+            <i class="fas fa-vote-yea me-2"></i>Vote for Your Aspirants
+        </h1>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0 d-flex align-items-center justify-content-center">
+                    <i class="fas fa-ballot-check me-2"></i>
+                    <span>Cast Your Vote</span>
+                </h3>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info d-flex align-items-center mb-4">
+                    <i class="fas fa-info-circle fs-5 me-3"></i>
+                    <div>
+                        <strong>How to vote:</strong> Select one candidate for each position below and submit your choices. Your vote is anonymous and can be cast only once.
+                    </div>
+                </div>
+                
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Aspirant Cards Section -->
+                    <div class="row" id="votingCards">
+                        {% for field in form %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card shadow-sm h-100 position-relative">
+                                    <div class="ribbon-wrapper position-absolute" style="top: -5px; right: -5px; z-index: 1;">
+                                        <div class="ribbon bg-primary text-white fw-bold px-3 py-1 text-uppercase rounded">
+                                            {{ field.label }}
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="aspirants-container p-3">
+                                            {% for choice in field.field.choices %}
+                                            <div class="candidate-option mb-3">
+                                                <input type="radio" name="{{ field.name }}" value="{{ choice.0 }}" 
+                                                       id="{{ field.name }}_{{ forloop.counter }}" 
+                                                       class="btn-check" 
+                                                       {% if field.value == choice.0 %}checked{% endif %}>
+                                                <label for="{{ field.name }}_{{ forloop.counter }}" 
+                                                       class="candidate-card w-100 btn btn-outline-light text-start p-0">
+                                                    <div class="card border-0 shadow-sm candidate-inner {% if field.value == choice.0 %}border-primary border-2{% endif %}">
+                                                        <div class="row g-0">
+                                                            <div class="col-md-4">
+                                                                {% if choice.1.image %}
+                                                                    <img src="{{ choice.1.image.url }}" 
+                                                                         class="img-fluid rounded-start" 
+                                                                         alt="{{ choice.1.name }}"
+                                                                         style="height: 120px; width: 100%; object-fit: cover;">
+                                                                {% else %}
+                                                                    <div class="bg-light d-flex align-items-center justify-content-center"
+                                                                         style="height: 120px;">
+                                                                        <i class="fas fa-user fa-3x text-secondary"></i>
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                            <div class="col-md-8">
+                                                                <div class="card-body">
+                                                                    <h5 class="card-title mb-1 text-dark">{{ choice.1.name }}</h5>
+                                                                    <p class="card-text">
+                                                                        <small class="text-muted">Candidate #{{ forloop.counter }}</small>
+                                                                    </p>
+                                                                    <div class="text-end">
+                                                                        <span class="badge {% if field.value == choice.0 %}bg-success{% else %}bg-secondary{% endif %}">
+                                                                            {% if field.value == choice.0 %}
+                                                                                <i class="fas fa-check me-1"></i> Selected
+                                                                            {% else %}
+                                                                                Select
+                                                                            {% endif %}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit My Vote
+                                </button>
+                            </div>
+                            <p class="text-center text-muted mt-3">
+                                <i class="fas fa-lock me-1"></i>
+                                Your vote is secure and anonymous
+                            </p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const radioInputs = document.querySelectorAll('input[type="radio"]');
+        radioInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                const name = this.name;
+                document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
+                    const card = radio.nextElementSibling.querySelector('.candidate-inner');
+                    const badge = card.querySelector('.badge');
+                    card.classList.remove('border-primary', 'border-2');
+                    badge.classList.remove('bg-success');
+                    badge.classList.add('bg-secondary');
+                    badge.innerHTML = 'Select';
+                });
+                const selectedCard = this.nextElementSibling.querySelector('.candidate-inner');
+                const selectedBadge = selectedCard.querySelector('.badge');
+                selectedCard.classList.add('border-primary', 'border-2');
+                selectedBadge.classList.remove('bg-secondary');
+                selectedBadge.classList.add('bg-success');
+                selectedBadge.innerHTML = '<i class="fas fa-check me-1"></i> Selected';
+            });
+        });
+    });
+</script>
+{% endblock %}
