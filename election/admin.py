@@ -28,18 +28,33 @@ class PortfolioAdmin(admin.ModelAdmin):
 
 @admin.register(Aspirant)
 class AspirantAdmin(admin.ModelAdmin):
-    list_display = ('name', 'portfolio', 'image_preview')
-
+    list_display = ('name', 'portfolio', 'vote_count', 'image_preview')
+    readonly_fields = ('name', 'portfolio', 'image', 'image_preview', 'vote_count')
+    
     def image_preview(self, obj):
         if obj.image:
             return format_html('<img src="{}" style="width: 40px; height: auto;" />', obj.image.url)
         return "-"
     image_preview.short_description = "Image"
 
+    def vote_count(self, obj):
+        return obj.vote_set.count()
+    vote_count.short_description = 'Votes'
+
+    # Prevent edits, additions, and deletions:
+    def has_add_permission(self, request):
+        return False
+    
+    def has_change_permission(self, request, obj=None):
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 @admin.register(Vote)
 class VoteAdmin(admin.ModelAdmin):
-    list_display = ('voter', 'aspirant', 'timestamp')
+    list_display = ('aspirant', 'timestamp')
 
 
 @admin.register(VoterList)

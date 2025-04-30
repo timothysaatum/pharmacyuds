@@ -2,11 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Voter, Vote, Aspirant, Portfolio
 from .forms import VoterVerificationForm, VoteForm
-from django.utils.timezone import now
 from django.http import JsonResponse
 from django.utils import timezone
-
-
 
 def verify_voter(request):
     if request.method == 'POST':
@@ -28,8 +25,6 @@ def verify_voter(request):
 
     return render(request, 'election/voter_form.html', {'form': form})
 
-
-
 def vote(request):
     voter_id = request.session.get('voter_id')
     if not voter_id:
@@ -43,10 +38,23 @@ def vote(request):
     if request.method == 'POST':
         form = VoteForm(request.POST)
         if form.is_valid():
-            for key, aspirant in form.cleaned_data.items():
-                print(f"Voting for aspirant ID: {aspirant}")
-                aspirant = Aspirant.objects.get(id=aspirant)
-                Vote.objects.create(voter=voter, aspirant=aspirant, timestamp=now())
+            for field_name, value in form.cleaned_data.items():
+                portfolio_id = int(field_name.split('_')[1])
+                portfolio = Portfolio.objects.get(id=portfolio_id)
+                aspirants = Aspirant.objects.filter(portfolio=portfolio)
+                
+                # Check if this is a single-candidate portfolio with yes/no endorsement
+                if aspirants.count() == 1 and value in ['yes', 'no']:
+                    aspirant = aspirants.first()
+                    # Only create a vote if the user selected 'yes' to endorse
+                    if value == 'yes':
+                        Vote.objects.create(voter=voter, aspirant=aspirant)
+                else:
+                    # Regular voting - value is the aspirant ID
+                    aspirant = Aspirant.objects.get(id=value)
+                    Vote.objects.create(voter=voter, aspirant=aspirant)
+            
+            # Mark the voter as having voted
             voter.has_voted = True
             voter.save()
             messages.success(request, "Your vote has been recorded.")
@@ -58,19 +66,6 @@ def vote(request):
     
     return render(request, 'election/vote_candidates.html', {'form': form})
 
-
-
-# def live_results(request):
-#     portfolios = Portfolio.objects.all()
-#     results = []
-#     for portfolio in portfolios:
-#         aspirants = Aspirant.objects.filter(portfolio=portfolio)
-#         aspirant_results = []
-#         for asp in aspirants:
-#             vote_count = Vote.objects.filter(aspirant=asp).count()
-#             aspirant_results.append({'aspirant': asp.name, 'votes': vote_count})
-#         results.append({'portfolio': portfolio.name, 'aspirants': aspirant_results})
-#     return JsonResponse({'results': results})
 def results_page(request):
     """Renders the initial results HTML page"""
     portfolios = Portfolio.objects.all().prefetch_related('aspirants')

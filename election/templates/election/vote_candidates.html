@@ -30,63 +30,105 @@
                 <form method="post" novalidate>
                     {% csrf_token %}
                     
-                    <!-- Aspirant Cards Section -->
                     <div class="row" id="votingCards">
                         {% for field in form %}
                             <div class="col-md-6 mb-4">
                                 <div class="card shadow-sm h-100 position-relative">
                                     <div class="ribbon-wrapper position-absolute" style="top: -5px; right: -5px; z-index: 1;">
-                                        <div class="ribbon bg-primary text-white fw-bold px-3 py-1 text-uppercase rounded">
+                                        <div class="ribbon bg-primary text-white fw-bold px-3 py-1 text-uppercase rounded mb-3">
                                             {{ field.label }}
                                         </div>
                                     </div>
                                     <div class="card-body p-0">
                                         <div class="aspirants-container p-3">
-                                            {% for choice in field.field.choices %}
-                                            <div class="candidate-option mb-3">
-                                                <input type="radio" name="{{ field.name }}" value="{{ choice.0 }}" 
-                                                       id="{{ field.name }}_{{ forloop.counter }}" 
-                                                       class="btn-check" 
-                                                       {% if field.value == choice.0 %}checked{% endif %}>
-                                                <label for="{{ field.name }}_{{ forloop.counter }}" 
-                                                       class="candidate-card w-100 btn btn-outline-light text-start p-0">
-                                                    <div class="card border-0 shadow-sm candidate-inner {% if field.value == choice.0 %}border-primary border-2{% endif %}">
-                                                        <div class="row g-0">
-                                                            <div class="col-md-4">
-                                                                {% if choice.1.image %}
-                                                                    <img src="{{ choice.1.image.url }}" 
-                                                                         class="img-fluid rounded-start" 
-                                                                         alt="{{ choice.1.name }}"
-                                                                         style="height: 120px; width: 100%; object-fit: cover;">
-                                                                {% else %}
-                                                                    <div class="bg-light d-flex align-items-center justify-content-center"
-                                                                         style="height: 120px;">
-                                                                        <i class="fas fa-user fa-3x text-secondary"></i>
-                                                                    </div>
-                                                                {% endif %}
+                                            {% if field.field.choices.0.0 == 'yes' %}
+                                                <!-- Endorsement (Yes/No) for single aspirant -->
+                                                {% with candidate=field.field.choices.0.1 %}
+                                                <div class="mb-3">
+                                                    <p class="fw-bold">Do you endorse {{ candidate.name }} for {{ field.label }}?</p>
+                                                    
+                                                    <!-- Improved image display for single candidate -->
+                                                    <div class="text-center mb-3">
+                                                        {% if candidate.image %}
+                                                            <div class="candidate-image-container mb-2">
+                                                                <img src="{{ candidate.image.url }}" 
+                                                                     class="rounded border shadow-sm" 
+                                                                     alt="{{ candidate.name }}"
+                                                                     style="width: 140px; height: 140px; object-fit: cover;">
                                                             </div>
-                                                            <div class="col-md-8">
-                                                                <div class="card-body">
-                                                                    <h5 class="card-title mb-1 text-dark">{{ choice.1.name }}</h5>
-                                                                    <p class="card-text">
-                                                                        <small class="text-muted">Candidate #{{ forloop.counter }}</small>
-                                                                    </p>
-                                                                    <div class="text-end">
-                                                                        <span class="badge {% if field.value == choice.0 %}bg-success{% else %}bg-secondary{% endif %}">
-                                                                            {% if field.value == choice.0 %}
-                                                                                <i class="fas fa-check me-1"></i> Selected
-                                                                            {% else %}
-                                                                                Select
-                                                                            {% endif %}
-                                                                        </span>
+                                                        {% else %}
+                                                            <div class="candidate-image-container mb-2" style="width: 140px; height: 140px; margin: 0 auto; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; border-radius: 5px;">
+                                                                <i class="fas fa-user fa-4x text-secondary"></i>
+                                                            </div>
+                                                        {% endif %}
+                                                        <h5 class="mb-0">{{ candidate.name }}</h5>
+                                                    </div>
+                                                    
+                                                    <!-- Styled radio buttons for endorsement -->
+                                                    <div class="mt-4">
+                                                        <div class="form-check d-flex align-items-center mb-2">
+                                                            <input class="form-check-input me-2" type="radio" name="{{ field.name }}" value="yes" id="{{ field.name }}_yes">
+                                                            <label class="form-check-label d-flex align-items-center" for="{{ field.name }}_yes">
+                                                                <span class="badge bg-success me-2"><i class="fas fa-check"></i></span>
+                                                                Yes, I endorse
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check d-flex align-items-center">
+                                                            <input class="form-check-input me-2" type="radio" name="{{ field.name }}" value="no" id="{{ field.name }}_no">
+                                                            <label class="form-check-label d-flex align-items-center" for="{{ field.name }}_no">
+                                                                <span class="badge bg-danger me-2"><i class="fas fa-times"></i></span>
+                                                                No, I do not endorse
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endwith %}
+                                            {% else %}
+                                                <!-- Standard candidate cards -->
+                                                {% for choice in field.field.choices %}
+                                                <div class="candidate-option mb-3">
+                                                    <input type="radio" name="{{ field.name }}" value="{{ choice.0 }}" 
+                                                           id="{{ field.name }}_{{ forloop.counter }}" 
+                                                           class="btn-check" 
+                                                           {% if field.value == choice.0 %}checked{% endif %}>
+                                                    <label for="{{ field.name }}_{{ forloop.counter }}" 
+                                                           class="candidate-card w-100 btn btn-outline-light text-start p-0">
+                                                        <div class="card border-0 shadow-sm candidate-inner {% if field.value == choice.0 %}border-primary border-2{% endif %}">
+                                                            <div class="row g-0 align-items-center">
+                                                                <!-- Improved image display for multiple candidates -->
+                                                                <div class="col-md-5 d-flex justify-content-center align-items-center p-2" style="min-height: 180px; background-color: #f8f9fa;">
+                                                                    {% if choice.1.image %}
+                                                                        <img src="{{ choice.1.image.url }}" 
+                                                                             class="img-fluid rounded border" 
+                                                                             alt="{{ choice.1.name }}"
+                                                                             style="max-height: 170px; max-width: 100%; object-fit: contain;">
+                                                                    {% else %}
+                                                                        <i class="fas fa-user fa-5x text-secondary"></i>
+                                                                    {% endif %}
+                                                                </div>
+                                                                <div class="col-md-7">
+                                                                    <div class="card-body">
+                                                                        <h5 class="card-title mb-1 text-dark">{{ choice.1.name }}</h5>
+                                                                        <p class="card-text">
+                                                                            <small class="text-muted">Candidate #{{ forloop.counter }}</small>
+                                                                        </p>
+                                                                        <div class="text-end">
+                                                                            <span class="badge {% if field.value == choice.0 %}bg-success{% else %}bg-secondary{% endif %}">
+                                                                                {% if field.value == choice.0 %}
+                                                                                    <i class="fas fa-check me-1"></i> Selected
+                                                                                {% else %}
+                                                                                    Select
+                                                                                {% endif %}
+                                                                            </span>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </label>
-                                            </div>
-                                            {% endfor %}
+                                                    </label>
+                                                </div>
+                                                {% endfor %}
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -94,7 +136,6 @@
                         {% endfor %}
                     </div>
 
-                    <!-- Submit Button -->
                     <div class="row mt-4">
                         <div class="col-12">
                             <div class="d-grid">
@@ -121,19 +162,23 @@
             input.addEventListener('change', function() {
                 const name = this.name;
                 document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
-                    const card = radio.nextElementSibling.querySelector('.candidate-inner');
-                    const badge = card.querySelector('.badge');
-                    card.classList.remove('border-primary', 'border-2');
-                    badge.classList.remove('bg-success');
-                    badge.classList.add('bg-secondary');
-                    badge.innerHTML = 'Select';
+                    const card = radio.nextElementSibling?.querySelector('.candidate-inner');
+                    const badge = card?.querySelector('.badge');
+                    if (card && badge) {
+                        card.classList.remove('border-primary', 'border-2');
+                        badge.classList.remove('bg-success');
+                        badge.classList.add('bg-secondary');
+                        badge.innerHTML = 'Select';
+                    }
                 });
-                const selectedCard = this.nextElementSibling.querySelector('.candidate-inner');
-                const selectedBadge = selectedCard.querySelector('.badge');
-                selectedCard.classList.add('border-primary', 'border-2');
-                selectedBadge.classList.remove('bg-secondary');
-                selectedBadge.classList.add('bg-success');
-                selectedBadge.innerHTML = '<i class="fas fa-check me-1"></i> Selected';
+                const selectedCard = this.nextElementSibling?.querySelector('.candidate-inner');
+                const selectedBadge = selectedCard?.querySelector('.badge');
+                if (selectedCard && selectedBadge) {
+                    selectedCard.classList.add('border-primary', 'border-2');
+                    selectedBadge.classList.remove('bg-secondary');
+                    selectedBadge.classList.add('bg-success');
+                    selectedBadge.innerHTML = '<i class="fas fa-check me-1"></i> Selected';
+                }
             });
         });
     });

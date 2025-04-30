@@ -1,10 +1,7 @@
 from django import forms
 from .models import ClassGroup, Portfolio, Aspirant
 from django.utils.safestring import mark_safe
-from .models import Portfolio, Aspirant
 
-# class AspirantRadioSelect(forms.RadioSelect):
-#     option_template_name = 'widgets/aspirant_option.html'
 class AspirantRadioSelect(forms.Widget):
     def render(self, name, value, attrs=None, renderer=None):
         output = []
@@ -23,10 +20,6 @@ class AspirantRadioSelect(forms.Widget):
             ''')
         return mark_safe(''.join(output))
 
-# class VoterVerificationForm(forms.Form):
-#     class_group = forms.ModelChoiceField(queryset=ClassGroup.objects.all(), label="Your Class")
-#     matric_number = forms.CharField(label="Your Student ID")
-
 class VoterVerificationForm(forms.Form):
     class_group = forms.ModelChoiceField(queryset=ClassGroup.objects.none(), label="Your Class")
     matric_number = forms.CharField(label="Your Student ID")
@@ -35,32 +28,6 @@ class VoterVerificationForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields['class_group'].queryset = ClassGroup.objects.all()
 
-
-# class VoteForm(forms.Form):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         for portfolio in Portfolio.objects.all():
-#             self.fields[f"portfolio_{portfolio.id}"] = forms.ModelChoiceField(
-#                 label=portfolio.name,
-#                 queryset=Aspirant.objects.filter(portfolio=portfolio),
-#                 widget=AspirantRadioSelect,
-#                 required=True
-#             )
-
-# class VoteForm(forms.Form):
-    
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         for portfolio in Portfolio.objects.all():
-#             aspirants = Aspirant.objects.filter(portfolio=portfolio)
-#             choices = [(aspirant.id, aspirant.name) for aspirant in aspirants]
-            
-#             self.fields[f"portfolio_{portfolio.id}"] = forms.ChoiceField(
-#                 label=portfolio.name,
-#                 choices=choices,  # Set the choices here
-#                 widget=AspirantRadioSelect(),
-#                 required=True
-#             )
 class VoteForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -68,10 +35,25 @@ class VoteForm(forms.Form):
 
         for portfolio in Portfolio.objects.all():
             aspirants = Aspirant.objects.filter(portfolio=portfolio)
-            choices = [(aspirant.id, aspirant) for aspirant in aspirants]  # pass aspirant object
-            self.fields[f"portfolio_{portfolio.id}"] = forms.ChoiceField(
-                label=portfolio.name,
-                choices=choices,
-                widget=forms.RadioSelect,
-                required=True
-            )
+            
+            # For portfolios with only one candidate, use yes/no endorsement
+            if aspirants.count() == 1:
+                single_aspirant = aspirants.first()
+                self.fields[f"portfolio_{portfolio.id}"] = forms.ChoiceField(
+                    label=portfolio.name,
+                    choices=[
+                        ('yes', single_aspirant),  # Store 'yes' as value and aspirant object for display
+                        ('no', single_aspirant),   # Store 'no' as value and aspirant object for display
+                    ],
+                    widget=forms.RadioSelect,
+                    required=True
+                )
+            else:
+                # Multiple candidates - regular voting
+                choices = [(aspirant.id, aspirant) for aspirant in aspirants]  # pass aspirant object
+                self.fields[f"portfolio_{portfolio.id}"] = forms.ChoiceField(
+                    label=portfolio.name,
+                    choices=choices,
+                    widget=forms.RadioSelect,
+                    required=True
+                )

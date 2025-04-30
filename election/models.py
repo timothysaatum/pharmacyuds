@@ -30,12 +30,28 @@ class Aspirant(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.portfolio.name}"
+    
+
+    def vote_count(self):
+        return self.vote_set.count()
+
+    vote_count.short_description = 'Votes'
 
 
 class Vote(models.Model):
-    voter = models.OneToOneField(Voter, on_delete=models.CASCADE)
+    voter = models.ForeignKey(Voter, on_delete=models.CASCADE)
     aspirant = models.ForeignKey(Aspirant, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('voter', 'aspirant')
+
+    
+    # def vote_count(self):
+    #     return self.vote_set.count()
+    
+    # vote_count.short_description = 'Votes'
+ 
 
 class VoterList(models.Model):
     file = models.FileField(upload_to='voter_files/')
