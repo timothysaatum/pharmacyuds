@@ -4,7 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('dragonforge/', admin.site.urls),
     path('', include('election.urls', namespace='election')),
 ]
 

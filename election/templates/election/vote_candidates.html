@@ -51,7 +51,11 @@
                                             <i class="fas fa-user-tie me-2"></i>{{ field.label }}
                                         </h5>
                                         <span class="badge bg-primary rounded-pill">
-                                            {{ field.field.choices|length }} candidate{{ field.field.choices|pluralize }}
+                                            {% if field.field.choices.0.0 == 'yes' %}
+                                                     1 candidate
+                                            {% else %}
+                                                {{ field.field.choices|length }} candidate{{ field.field.choices|pluralize }}
+                                            {% endif %}
                                         </span>
                                     </div>
                                     <div class="card-body p-0">
