@@ -29,7 +29,7 @@ class PortfolioAdmin(admin.ModelAdmin):
 @admin.register(Aspirant)
 class AspirantAdmin(admin.ModelAdmin):
     list_display = ('name', 'portfolio', 'vote_count', 'image_preview')
-    readonly_fields = ('name', 'portfolio', 'image', 'image_preview', 'vote_count')
+    # readonly_fields = ('name', 'portfolio', 'image', 'image_preview', 'vote_count')
     
     def image_preview(self, obj):
         if obj.image:
