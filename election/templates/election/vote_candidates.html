@@ -4,80 +4,91 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col-12">
-        <h1 class="page-title">
-            <i class="fas fa-vote-yea me-2"></i>Vote for Your Aspirants
-        </h1>
+        <div class="d-flex align-items-center justify-content-between">
+            <h1 class="page-title mb-0">
+                <i class="fas fa-vote-yea me-2"></i>Vote for Your Aspirants
+            </h1>
+            <div class="progress" style="width: 200px; height: 10px;">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+        <p class="text-muted mt-2">Review and select your preferred candidates</p>
     </div>
 </div>
 
 <div class="row justify-content-center">
     <div class="col-lg-10">
         <div class="card shadow border-0">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header bg-primary text-white position-relative">
                 <h3 class="mb-0 d-flex align-items-center justify-content-center">
                     <i class="fas fa-ballot-check me-2"></i>
                     <span>Cast Your Vote</span>
                 </h3>
+                <div class="position-absolute top-0 end-0 mt-2 me-3">
+                    <span class="badge bg-light text-primary">
+                        <i class="fas fa-user-shield me-1"></i> Anonymous
+                    </span>
+                </div>
             </div>
             <div class="card-body p-4">
                 <div class="alert alert-info d-flex align-items-center mb-4">
                     <i class="fas fa-info-circle fs-5 me-3"></i>
                     <div>
-                        <strong>How to vote:</strong> Select one candidate for each position below and submit your choices. Your vote is anonymous and can be cast only once.
+                        <strong>How to vote:</strong> Select one candidate for each position below and submit your choices. 
+                        <span class="d-block mt-1"><i class="fas fa-exclamation-circle me-1"></i> You can't change your vote after submission.</span>
                     </div>
                 </div>
                 
                 <form method="post" novalidate>
                     {% csrf_token %}
                     
-                    <div class="row" id="votingCards">
+                    <div class="row g-4" id="votingCards">
                         {% for field in form %}
-                            <div class="col-md-6 mb-4">
-                                <div class="card shadow-sm h-100 position-relative">
-                                    <div class="ribbon-wrapper position-absolute" style="top: -5px; right: -5px; z-index: 1;">
-                                        <div class="ribbon bg-primary text-white fw-bold px-3 py-1 text-uppercase rounded mb-3">
-                                            {{ field.label }}
-                                        </div>
+                            <div class="col-md-6">
+                                <div class="card shadow-sm h-100 position-relative border-0">
+                                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0 text-primary">
+                                            <i class="fas fa-user-tie me-2"></i>{{ field.label }}
+                                        </h5>
+                                        <span class="badge bg-primary rounded-pill">
+                                            {{ field.field.choices|length }} candidate{{ field.field.choices|pluralize }}
+                                        </span>
                                     </div>
                                     <div class="card-body p-0">
                                         <div class="aspirants-container p-3">
                                             {% if field.field.choices.0.0 == 'yes' %}
                                                 <!-- Endorsement (Yes/No) for single aspirant -->
                                                 {% with candidate=field.field.choices.0.1 %}
-                                                <div class="mb-3">
-                                                    <p class="fw-bold">Do you endorse {{ candidate.name }} for {{ field.label }}?</p>
-                                                    
-                                                    <!-- Improved image display for single candidate -->
-                                                    <div class="text-center mb-3">
+                                                <div class="text-center">
+                                                    <!-- Consistent face display -->
+                                                    <div class="candidate-face mb-3 mx-auto" style="width: 160px; height: 160px;">
                                                         {% if candidate.image %}
-                                                            <div class="candidate-image-container mb-2">
-                                                                <img src="{{ candidate.image.url }}" 
-                                                                     class="rounded border shadow-sm" 
-                                                                     alt="{{ candidate.name }}"
-                                                                     style="width: 140px; height: 140px; object-fit: cover;">
-                                                            </div>
+                                                            <img src="{{ candidate.image.url }}" 
+                                                                 class="img-fluid rounded-circle border border-4 border-primary object-fit-cover w-100 h-100" 
+                                                                 alt="{{ candidate.name }}"
+                                                                 style="object-position: top center;">
                                                         {% else %}
-                                                            <div class="candidate-image-container mb-2" style="width: 140px; height: 140px; margin: 0 auto; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; border-radius: 5px;">
+                                                            <div class="d-flex align-items-center justify-content-center w-100 h-100 rounded-circle border border-4 border-primary bg-light">
                                                                 <i class="fas fa-user fa-4x text-secondary"></i>
                                                             </div>
                                                         {% endif %}
-                                                        <h5 class="mb-0">{{ candidate.name }}</h5>
                                                     </div>
                                                     
-                                                    <!-- Styled radio buttons for endorsement -->
-                                                    <div class="mt-4">
-                                                        <div class="form-check d-flex align-items-center mb-2">
-                                                            <input class="form-check-input me-2" type="radio" name="{{ field.name }}" value="yes" id="{{ field.name }}_yes">
-                                                            <label class="form-check-label d-flex align-items-center" for="{{ field.name }}_yes">
-                                                                <span class="badge bg-success me-2"><i class="fas fa-check"></i></span>
-                                                                Yes, I endorse
+                                                    <h4 class="mb-3">{{ candidate.name }}</h4>
+                                                    <p class="text-muted mb-4">{{ candidate.bio|default:"No description available"|truncatewords:20 }}</p>
+                                                    
+                                                    <!-- Improved endorsement toggle -->
+                                                    <div class="d-flex justify-content-center gap-3">
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" name="{{ field.name }}" value="yes" id="{{ field.name }}_yes" required>
+                                                            <label class="form-check-label btn btn-success px-4 py-2 rounded-pill" for="{{ field.name }}_yes">
+                                                                <i class="fas fa-thumbs-up me-2"></i>Endorse
                                                             </label>
                                                         </div>
-                                                        <div class="form-check d-flex align-items-center">
-                                                            <input class="form-check-input me-2" type="radio" name="{{ field.name }}" value="no" id="{{ field.name }}_no">
-                                                            <label class="form-check-label d-flex align-items-center" for="{{ field.name }}_no">
-                                                                <span class="badge bg-danger me-2"><i class="fas fa-times"></i></span>
-                                                                No, I do not endorse
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" name="{{ field.name }}" value="no" id="{{ field.name }}_no">
+                                                            <label class="form-check-label btn btn-outline-danger px-4 py-2 rounded-pill" for="{{ field.name }}_no">
+                                                                <i class="fas fa-thumbs-down me-2"></i>Decline
                                                             </label>
                                                         </div>
                                                     </div>
@@ -85,49 +96,66 @@
                                                 {% endwith %}
                                             {% else %}
                                                 <!-- Standard candidate cards -->
-                                                {% for choice in field.field.choices %}
-                                                <div class="candidate-option mb-3">
-                                                    <input type="radio" name="{{ field.name }}" value="{{ choice.0 }}" 
-                                                           id="{{ field.name }}_{{ forloop.counter }}" 
-                                                           class="btn-check" 
-                                                           {% if field.value == choice.0 %}checked{% endif %}>
-                                                    <label for="{{ field.name }}_{{ forloop.counter }}" 
-                                                           class="candidate-card w-100 btn btn-outline-light text-start p-0">
-                                                        <div class="card border-0 shadow-sm candidate-inner {% if field.value == choice.0 %}border-primary border-2{% endif %}">
-                                                            <div class="row g-0 align-items-center">
-                                                                <!-- Improved image display for multiple candidates -->
-                                                                <div class="col-md-5 d-flex justify-content-center align-items-center p-2" style="min-height: 180px; background-color: #f8f9fa;">
-                                                                    {% if choice.1.image %}
-                                                                        <img src="{{ choice.1.image.url }}" 
-                                                                             class="img-fluid rounded border" 
-                                                                             alt="{{ choice.1.name }}"
-                                                                             style="max-height: 170px; max-width: 100%; object-fit: contain;">
-                                                                    {% else %}
-                                                                        <i class="fas fa-user fa-5x text-secondary"></i>
-                                                                    {% endif %}
-                                                                </div>
-                                                                <div class="col-md-7">
-                                                                    <div class="card-body">
-                                                                        <h5 class="card-title mb-1 text-dark">{{ choice.1.name }}</h5>
-                                                                        <p class="card-text">
-                                                                            <small class="text-muted">Candidate #{{ forloop.counter }}</small>
-                                                                        </p>
-                                                                        <div class="text-end">
-                                                                            <span class="badge {% if field.value == choice.0 %}bg-success{% else %}bg-secondary{% endif %}">
-                                                                                {% if field.value == choice.0 %}
-                                                                                    <i class="fas fa-check me-1"></i> Selected
-                                                                                {% else %}
-                                                                                    Select
+                                                <div class="row g-3">
+                                                    {% for choice in field.field.choices %}
+                                                    <div class="col-12">
+                                                        <input type="radio" name="{{ field.name }}" value="{{ choice.0 }}" 
+                                                               id="{{ field.name }}_{{ forloop.counter }}" 
+                                                               class="btn-check" 
+                                                               {% if field.value == choice.0 %}checked{% endif %} required>
+                                                        <label for="{{ field.name }}_{{ forloop.counter }}" 
+                                                               class="candidate-card w-100 btn p-0">
+                                                            <div class="card border-0 shadow-sm candidate-inner {% if field.value == choice.0 %}border-success border-2 bg-success-light{% endif %} h-100">
+                                                                <div class="row g-0 h-100">
+                                                                    <!-- Consistent face display -->
+                                                                    <div class="col-md-5 d-flex justify-content-center align-items-center p-3 bg-light">
+                                                                        <div class="candidate-face" style="width: 120px; height: 120px;">
+                                                                            {% if choice.1.image %}
+                                                                                <img src="{{ choice.1.image.url }}" 
+                                                                                     class="img-fluid rounded-circle border border-3 border-white shadow object-fit-cover w-100 h-100" 
+                                                                                     alt="{{ choice.1.name }}"
+                                                                                     style="object-position: top center;">
+                                                                            {% else %}
+                                                                                <div class="rounded-circle border border-3 border-white bg-white shadow d-flex align-items-center justify-content-center w-100 h-100">
+                                                                                    <i class="fas fa-user fa-3x text-secondary"></i>
+                                                                                </div>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- Candidate details -->
+                                                                    <div class="col-md-7 d-flex flex-column">
+                                                                        <div class="card-body">
+                                                                            <h5 class="card-title mb-1">{{ choice.1.name }}</h5>
+                                                                            <p class="card-text text-muted small mb-2">
+                                                                                {% if choice.1.party %}
+                                                                                    <span class="badge bg-primary bg-opacity-10 text-primary">{{ choice.1.party }}</span>
                                                                                 {% endif %}
-                                                                            </span>
+                                                                            </p>
+                                                                            <p class="card-text small text-muted mb-2">
+                                                                                {{ choice.1.bio|default:"No description available"|truncatewords:15 }}
+                                                                            </p>
+                                                                        </div>
+                                                                        <div class="card-footer bg-transparent border-0 pt-0 pb-3">
+                                                                            <div class="d-flex justify-content-between align-items-center">
+                                                                                <span class="badge rounded-pill bg-secondary">
+                                                                                    Candidate #{{ forloop.counter }}
+                                                                                </span>
+                                                                                <span class="badge {% if field.value == choice.0 %}bg-success{% else %}bg-light text-dark{% endif %} rounded-pill px-3 py-2">
+                                                                                    {% if field.value == choice.0 %}
+                                                                                        <i class="fas fa-check-circle me-1"></i> Selected
+                                                                                    {% else %}
+                                                                                        <i class="fas fa-hand-pointer me-1"></i> Select
+                                                                                    {% endif %}
+                                                                                </span>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </label>
+                                                        </label>
+                                                    </div>
+                                                    {% endfor %}
                                                 </div>
-                                                {% endfor %}
                                             {% endif %}
                                         </div>
                                     </div>
@@ -136,17 +164,24 @@
                         {% endfor %}
                     </div>
 
-                    <div class="row mt-4">
+                    <div class="row mt-5">
                         <div class="col-12">
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-success btn-lg">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="#" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Review
+                                </a>
+                                <button type="submit" class="btn btn-success btn-lg px-5 py-3 rounded-pill shadow">
                                     <i class="fas fa-paper-plane me-2"></i>Submit My Vote
                                 </button>
                             </div>
-                            <p class="text-center text-muted mt-3">
-                                <i class="fas fa-lock me-1"></i>
-                                Your vote is secure and anonymous
-                            </p>
+                            <div class="text-center mt-4">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="confirmVote" required>
+                                    <label class="form-check-label small text-muted" for="confirmVote">
+                                        I confirm that my selections are final and I understand I cannot change my vote after submission
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -155,8 +190,29 @@
     </div>
 </div>
 
+<style>
+    .bg-success-light {
+        background-color: rgba(25, 135, 84, 0.05) !important;
+    }
+    .candidate-card:hover .candidate-inner {
+        border-color: #0d6efd !important;
+        transform: translateY(-2px);
+    }
+    .candidate-inner {
+        transition: all 0.2s ease;
+    }
+    .object-fit-cover {
+        object-fit: cover;
+    }
+    .candidate-face {
+        overflow: hidden;
+        position: relative;
+    }
+</style>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Enhance radio button selection
         const radioInputs = document.querySelectorAll('input[type="radio"]');
         radioInputs.forEach(input => {
             input.addEventListener('change', function() {
@@ -165,22 +221,37 @@
                     const card = radio.nextElementSibling?.querySelector('.candidate-inner');
                     const badge = card?.querySelector('.badge');
                     if (card && badge) {
-                        card.classList.remove('border-primary', 'border-2');
+                        card.classList.remove('border-success', 'border-2', 'bg-success-light');
                         badge.classList.remove('bg-success');
-                        badge.classList.add('bg-secondary');
-                        badge.innerHTML = 'Select';
+                        badge.classList.add('bg-light', 'text-dark');
+                        badge.innerHTML = '<i class="fas fa-hand-pointer me-1"></i> Select';
                     }
                 });
+                
                 const selectedCard = this.nextElementSibling?.querySelector('.candidate-inner');
                 const selectedBadge = selectedCard?.querySelector('.badge');
                 if (selectedCard && selectedBadge) {
-                    selectedCard.classList.add('border-primary', 'border-2');
-                    selectedBadge.classList.remove('bg-secondary');
+                    selectedCard.classList.add('border-success', 'border-2', 'bg-success-light');
+                    selectedBadge.classList.remove('bg-light', 'text-dark');
                     selectedBadge.classList.add('bg-success');
-                    selectedBadge.innerHTML = '<i class="fas fa-check me-1"></i> Selected';
+                    selectedBadge.innerHTML = '<i class="fas fa-check-circle me-1"></i> Selected';
                 }
             });
+            
+            // Initialize checked states
+            if (input.checked) {
+                input.dispatchEvent(new Event('change'));
+            }
         });
+        
+        // Add confirmation dialog
+        // const form = document.querySelector('form');
+        // form.addEventListener('submit', function(e) {
+        //     if (!document.getElementById('confirmVote').checked) {
+        //         e.preventDefault();
+        //         alert('Please confirm that your selections are final before submitting.');
+        //     }
+        // });
     });
 </script>
 {% endblock %}

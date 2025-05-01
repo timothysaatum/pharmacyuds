@@ -2,53 +2,109 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col-12 d-flex justify-content-between align-items-center">
-        <h1 class="page-title">
-            <i class="fas fa-chart-line me-2"></i>Live Results
-        </h1>
         <div>
-            <span class="badge bg-success" id="live-indicator">
-                <i class="fas fa-circle me-1"></i> LIVE
+            <h1 class="page-title mb-1">
+                <i class="fas fa-chart-line me-2"></i>Live Election Results
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Results</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex align-items-center">
+            <span class="badge bg-success px-3 py-2" id="live-indicator">
+                <i class="fas fa-circle me-1"></i> LIVE UPDATES
             </span>
-            <small class="text-muted ms-2" id="last-updated"></small>
+            <div class="ms-3 text-end">
+                <small class="text-muted d-block">Last updated</small>
+                <span class="fw-bold" id="last-updated">--:--</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-light border-0 shadow-sm">
+            <div class="card-body py-3">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="mb-0"><i class="fas fa-info-circle text-primary me-2"></i> Real-time election results</h5>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-primary active">All Positions</button>
+                            <button type="button" class="btn btn-outline-primary">Leading</button>
+                            <button type="button" class="btn btn-outline-primary">Close Races</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <div id="results-container">
     <!-- Results will be loaded here -->
-    <div class="text-center py-5">
-        <div class="spinner-border text-primary" role="status">
+    <div class="text-center py-5 my-5">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
-        <p class="mt-2 text-muted">Loading results...</p>
+        <h4 class="mt-3 text-primary">Loading election results</h4>
+        <p class="text-muted">Please wait while we fetch the latest data</p>
     </div>
 </div>
 
 <!-- Template for portfolio results (used by JavaScript) -->
 <template id="portfolio-template">
-    <div class="row mb-4">
-        <div class="col-lg-8 mx-auto">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">
-                        <i class="fas fa-trophy me-2"></i>
-                        <span class="portfolio-name"></span>
-                    </h4>
-                    <small class="text-white-50">Total votes: <span class="total-votes"></span></small>
+    <div class="row mb-4 portfolio-card">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom">
+                    <div>
+                        <h3 class="mb-0 text-primary">
+                            <i class="fas fa-trophy me-2"></i>
+                            <span class="portfolio-name"></span>
+                        </h3>
+                        <small class="text-muted">
+                            <i class="fas fa-users me-1"></i> 
+                            <span class="candidate-count"></span> Candidates • 
+                            <i class="fas fa-vote-yea me-1"></i> 
+                            <span class="total-votes"></span> Total Votes
+                        </small>
+                    </div>
+                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
+                        <i class="fas fa-sync-alt me-1"></i> Auto-updating
+                    </span>
                 </div>
                 <div class="card-body p-0">
-                    <ul class="list-group list-group-flush aspirants-list">
-                        <!-- Aspirants will be inserted here -->
-                    </ul>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th style="width: 50px;">Rank</th>
+                                    <th>Candidate</th>
+                                    <th class="text-center">Votes</th>
+                                    <th class="text-center">Percentage</th>
+                                    <th style="width: 200px;">Progress</th>
+                                </tr>
+                            </thead>
+                            <tbody class="aspirants-list">
+                                <!-- Aspirants will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
                     <small class="text-muted">
-                        <i class="fas fa-sync-alt me-1"></i>
-                        Results automatically update every minute
+                        <i class="fas fa-clock me-1"></i>
+                        Last updated: <span class="portfolio-updated"></span>
                     </small>
-                    <span class="badge bg-light text-dark">
-                        <i class="fas fa-users me-1"></i> <span class="candidate-count"></span> Candidates
-                    </span>
+                    <button class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-chart-pie me-1"></i> View Analytics
+                    </button>
                 </div>
             </div>
         </div>
@@ -57,26 +113,51 @@
 
 <!-- Template for an aspirant result item (used by JavaScript) -->
 <template id="aspirant-template">
-    <li class="list-group-item d-flex justify-content-between align-items-center p-3 aspirant-item">
-        <div class="d-flex align-items-center">
-            <div class="position-relative candidate-image-container me-3">
-                <!-- Rank badge will be added here for top candidates -->
-            </div>
-            <div>
-                <h5 class="mb-0 fw-bold candidate-name"></h5>
-                <small class="text-muted candidate-rank"></small>
-            </div>
-        </div>
-        <div class="d-flex flex-column align-items-end">
+    <tr class="aspirant-item">
+        <td class="text-center">
+            <span class="badge rank-badge rounded-circle d-inline-flex align-items-center justify-content-center"></span>
+        </td>
+        <td>
             <div class="d-flex align-items-center">
-                <h4 class="mb-0 me-2 fw-bold vote-count"></h4>
-                <span class="badge vote-percentage"></span>
+                <div class="position-relative me-3">
+                    <div class="candidate-face-container rounded-circle border border-2 border-white shadow-sm overflow-hidden" style="width: 60px; height: 60px;">
+                        <!-- Face will be inserted here -->
+                    </div>
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold candidate-name"></h6>
+                    <small class="text-muted candidate-party" style="display: none;"></small>
+                </div>
             </div>
-            <div class="progress mt-2 vote-progress" style="height: 8px; width: 120px;">
+        </td>
+        <td class="text-center fw-bold vote-count"></td>
+        <td class="text-center">
+            <span class="badge vote-percentage rounded-pill py-2 px-3"></span>
+        </td>
+        <td>
+            <div class="progress" style="height: 10px;">
                 <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
+        </td>
+    </tr>
+</template>
+
+<!-- Empty state template -->
+<template id="empty-template">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-info-circle fa-4x text-muted mb-4"></i>
+                    <h3 class="text-muted">No Results Available</h3>
+                    <p class="text-muted mb-4">There are no election results to display at this time.</p>
+                    <button class="btn btn-primary" id="refresh-results">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh
+                    </button>
+                </div>
+            </div>
         </div>
-    </li>
+    </div>
 </template>
 
 <script>
@@ -85,6 +166,7 @@
         const lastUpdatedEl = document.getElementById('last-updated');
         const portfolioTemplate = document.getElementById('portfolio-template');
         const aspirantTemplate = document.getElementById('aspirant-template');
+        const emptyTemplate = document.getElementById('empty-template');
         const liveIndicator = document.getElementById('live-indicator');
         
         let updateInterval;
@@ -96,45 +178,56 @@
             return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         }
         
-        // Create rank badge for top candidates
+        // Create rank badge
         function createRankBadge(rank) {
             const badge = document.createElement('span');
-            badge.className = 'position-absolute top-0 start-0 translate-middle badge rounded-pill';
+            badge.className = 'rank-badge d-inline-flex align-items-center justify-content-center';
             
             if (rank === 1) {
-                badge.className += ' bg-warning';
+                badge.className += ' bg-warning text-dark';
                 badge.innerHTML = '<i class="fas fa-crown"></i>';
+                badge.style = 'width: 30px; height: 30px;';
             } else if (rank === 2) {
-                badge.className += ' bg-secondary';
-                badge.innerHTML = '2';
+                badge.className += ' bg-secondary text-white';
+                badge.textContent = rank;
+                badge.style = 'width: 28px; height: 28px;';
             } else if (rank === 3) {
-                badge.className += ' bg-info';
-                badge.innerHTML = '3';
+                badge.className += ' bg-info text-white';
+                badge.textContent = rank;
+                badge.style = 'width: 26px; height: 26px;';
+            } else {
+                badge.className += ' bg-light text-dark';
+                badge.textContent = rank;
+                badge.style = 'width: 24px; height: 24px;';
             }
             
             return badge;
         }
         
-        // Create candidate image or placeholder
-        function createCandidateImage(imageUrl, candidateName, rank) {
+        // Create candidate face - ensures face is always visible
+        function createCandidateFace(imageUrl, candidateName) {
+            const container = document.createElement('div');
+            container.className = 'w-100 h-100';
+            
             if (imageUrl) {
                 const img = document.createElement('img');
                 img.src = imageUrl;
                 img.alt = candidateName;
-                img.className = 'rounded-circle';
-                img.style = 'width: 60px; height: 60px; object-fit: cover;';
-                return img;
+                img.className = 'w-100 h-100 object-fit-cover';
+                img.style = 'object-position: top center;';
+                container.appendChild(img);
             } else {
-                const placeholder = document.createElement('div');
-                placeholder.className = 'rounded-circle bg-secondary d-flex align-items-center justify-content-center';
-                placeholder.style = 'width: 60px; height: 60px;';
+                // Fallback with colored initial avatar
+                const initials = candidateName.split(' ').map(n => n[0]).join('').toUpperCase();
+                const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
                 
-                const icon = document.createElement('i');
-                icon.className = 'fas fa-user text-white fs-4';
-                placeholder.appendChild(icon);
-                
-                return placeholder;
+                container.className += ' d-flex align-items-center justify-content-center text-white fw-bold';
+                container.style = `background-color: ${color}; font-size: 1.25rem;`;
+                container.textContent = initials.substring(0, 2);
             }
+            
+            return container;
         }
         
         // Function to render a single aspirant
@@ -142,36 +235,33 @@
             const template = aspirantTemplate.content.cloneNode(true);
             const item = template.querySelector('.aspirant-item');
             
-            // Set aspirant name and rank
-            item.querySelector('.candidate-name').textContent = aspirant.name;
-            item.querySelector('.candidate-rank').textContent = `Candidate #${rank}`;
+            // Set rank
+            const rankBadge = item.querySelector('.rank-badge');
+            rankBadge.parentNode.replaceChild(createRankBadge(rank), rankBadge);
             
-            // Set vote count and percentage
-            item.querySelector('.vote-count').textContent = aspirant.votes;
+            // Set aspirant details
+            item.querySelector('.candidate-name').textContent = aspirant.name;
+            
+            // Set votes and percentage
+            item.querySelector('.vote-count').textContent = aspirant.votes.toLocaleString();
             
             const percentageEl = item.querySelector('.vote-percentage');
             percentageEl.textContent = `${aspirant.percentage}%`;
-            percentageEl.className = `badge ${rank === 1 ? 'bg-primary' : 'bg-secondary'}`;
+            percentageEl.className = `badge vote-percentage rounded-pill py-2 px-3 ${rank === 1 ? 'bg-primary' : 'bg-secondary'}`;
             
             // Set progress bar
             const progressBar = item.querySelector('.progress-bar');
             progressBar.style.width = `${aspirant.percentage}%`;
             progressBar.className = `progress-bar ${rank === 1 ? 'bg-primary' : 'bg-secondary'}`;
+            progressBar.setAttribute('aria-valuenow', aspirant.percentage);
             
-            // Add aspirant image or placeholder
-            const imageContainer = item.querySelector('.candidate-image-container');
-            const image = createCandidateImage(aspirant.image_url, aspirant.name, rank);
-            imageContainer.appendChild(image);
+            // Add candidate face (always visible)
+            const faceContainer = item.querySelector('.candidate-face-container');
+            faceContainer.appendChild(createCandidateFace(aspirant.image_url, aspirant.name));
             
-            // Add rank badge for top 3
-            if (rank <= 3) {
-                const badge = createRankBadge(rank);
-                imageContainer.appendChild(badge);
-            }
-            
-            // Highlight winner if needed
+            // Highlight the winner's row
             if (rank === 1) {
-                item.querySelector('.vote-count').classList.add('text-primary');
+                item.classList.add('table-primary');
             }
             
             return item;
@@ -181,19 +271,23 @@
         function renderPortfolio(portfolio) {
             const template = portfolioTemplate.content.cloneNode(true);
             
-            // Set portfolio name and total votes
+            // Set portfolio details
             template.querySelector('.portfolio-name').textContent = portfolio.name;
-            template.querySelector('.total-votes').textContent = portfolio.total_votes;
+            template.querySelector('.total-votes').textContent = portfolio.total_votes.toLocaleString();
             template.querySelector('.candidate-count').textContent = portfolio.aspirants.length;
+            template.querySelector('.portfolio-updated').textContent = formatDateTime(portfolio.last_updated);
             
             // Add aspirants
             const aspirantsList = template.querySelector('.aspirants-list');
             
             if (portfolio.aspirants.length === 0) {
-                const emptyItem = document.createElement('li');
-                emptyItem.className = 'list-group-item text-center p-4';
-                emptyItem.innerHTML = '<i class="fas fa-info-circle me-2 text-info"></i> No candidates available for this position yet.';
-                aspirantsList.appendChild(emptyItem);
+                const emptyRow = document.createElement('tr');
+                emptyRow.innerHTML = `
+                    <td colspan="5" class="text-center py-4">
+                        <i class="fas fa-info-circle me-2 text-muted"></i> No candidates available for this position
+                    </td>
+                `;
+                aspirantsList.appendChild(emptyRow);
             } else {
                 portfolio.aspirants.forEach((aspirant, index) => {
                     const aspirantEl = renderAspirant(aspirant, index + 1, portfolio.total_votes);
@@ -210,13 +304,8 @@
             resultsContainer.innerHTML = '';
             
             if (data.results.length === 0) {
-                resultsContainer.innerHTML = `
-                    <div class="text-center py-5">
-                        <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
-                        <h4>No election data available yet</h4>
-                        <p class="text-muted">Check back soon for results</p>
-                    </div>
-                `;
+                resultsContainer.appendChild(emptyTemplate.content.cloneNode(true));
+                document.getElementById('refresh-results').addEventListener('click', fetchResults);
                 return;
             }
             
@@ -225,9 +314,9 @@
             });
             
             // Update last updated time
-            lastUpdatedEl.textContent = `Updated at ${formatDateTime(data.last_updated)}`;
+            lastUpdatedEl.textContent = formatDateTime(data.last_updated);
             
-            // Pulse animation for live indicator
+            // Animate live indicator
             liveIndicator.classList.add('pulse');
             setTimeout(() => {
                 liveIndicator.classList.remove('pulse');
@@ -236,6 +325,17 @@
         
         // Function to fetch results
         function fetchResults() {
+            // Show loading state
+            resultsContainer.innerHTML = `
+                <div class="text-center py-5 my-5">
+                    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h4 class="mt-3 text-primary">Loading election results</h4>
+                    <p class="text-muted">Please wait while we fetch the latest data</p>
+                </div>
+            `;
+            
             fetch('/api/live-results/')
                 .then(response => response.json())
                 .then(data => {
@@ -244,43 +344,80 @@
                 .catch(error => {
                     console.error('Error fetching results:', error);
                     
-                    // If we have previous data, continue showing it
+                    // If we have previous data, continue showing it with offline warning
                     if (lastData) {
                         renderResults(lastData);
+                        showOfflineWarning();
                     } else {
                         resultsContainer.innerHTML = `
                             <div class="alert alert-danger">
                                 <i class="fas fa-exclamation-triangle me-2"></i>
-                                Error loading results. Please try again later.
+                                Error loading results. Please check your connection and try again.
                             </div>
                         `;
                     }
-                    
-                    // Change live indicator to show offline status
-                    liveIndicator.className = 'badge bg-danger';
-                    liveIndicator.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i> OFFLINE';
                 });
         }
         
-        // Fetch results immediately and then every 60 seconds
-        fetchResults();
-        updateInterval = setInterval(fetchResults, 60000);
+        function showOfflineWarning() {
+            const toast = document.createElement('div');
+            toast.className = 'position-fixed bottom-0 end-0 p-3';
+            toast.style = 'z-index: 11';
+            toast.innerHTML = `
+                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header bg-danger text-white">
+                        <strong class="me-auto">Connection Issue</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        <i class="fas fa-wifi-slash me-2"></i> Showing cached results. Trying to reconnect...
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
         
-        // Clean up interval when leaving page
+        // Initial fetch and set up auto-refresh
+        fetchResults();
+        updateInterval = setInterval(fetchResults, 30000); // Update every 30 seconds
+        
+        // Clean up when leaving page
         window.addEventListener('beforeunload', () => {
             clearInterval(updateInterval);
         });
         
-        // Add pulse animation for live indicator
+        // Add styles
         const styleEl = document.createElement('style');
         styleEl.textContent = `
             @keyframes pulse {
-                0% { opacity: 1; }
-                50% { opacity: 0.5; }
-                100% { opacity: 1; }
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
             }
             .pulse {
-                animation: pulse 1s;
+                animation: pulse 0.5s ease;
+            }
+            .object-fit-cover {
+                object-fit: cover;
+            }
+            .portfolio-card {
+                transition: all 0.3s ease;
+            }
+            .portfolio-card:hover {
+                transform: translateY(-2px);
+            }
+            .candidate-face-container {
+                transition: all 0.3s ease;
+            }
+            .candidate-face-container:hover {
+                transform: scale(1.1);
+            }
+            .progress-bar {
+                transition: width 1s ease;
             }
         `;
         document.head.appendChild(styleEl);
