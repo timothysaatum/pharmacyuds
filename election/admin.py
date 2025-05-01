@@ -58,18 +58,25 @@ class VoteAdmin(admin.ModelAdmin):
 
 
 @admin.register(VoterList)
-class VoterFileUploadAdmin(admin.ModelAdmin):
+class VoterListAdmin(admin.ModelAdmin):
     list_display = ('file', 'uploaded_at')
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
+
         file = obj.file
+        path = file.path
+        # print('file =',file, 'path =',path)
         if file.name.endswith('.xlsx') or file.name.endswith('.xls'):
-            data = extract_voters_from_excel(file)
+            data = extract_voters_from_excel(path)
         elif file.name.endswith('.docx'):
-            data = extract_voters_from_word(file)
+            # print("It's me")
+            data = extract_voters_from_word(path)
+            # print(data)
         elif file.name.endswith('.pdf'):
-            data = extract_voters_from_pdf(file)
+            data = extract_voters_from_pdf(path)
         else:
             data = []
+
+        # print(f"Importing {len(data)} voters from {file.name}...")
         save_voter_list(data)
