@@ -41,15 +41,15 @@ class AspirantAdmin(admin.ModelAdmin):
         return obj.vote_set.count()
     vote_count.short_description = 'Votes'
 
-    # Prevent edits, additions, and deletions:
-    def has_add_permission(self, request):
-        return False
+    # # Prevent edits, additions, and deletions:
+    # def has_add_permission(self, request):
+    #     return False
     
-    def has_change_permission(self, request, obj=None):
-        return False
+    # def has_change_permission(self, request, obj=None):
+    #     return False
     
-    def has_delete_permission(self, request, obj=None):
-        return False
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
 
 
 @admin.register(Vote)
