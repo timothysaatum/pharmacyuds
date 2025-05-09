@@ -62,21 +62,18 @@ def extract_voters_from_word(file_path):
             if len(cells) < 2:
                 continue
 
-            for cell in cells:
-                line = cell.text.strip()
-                match = re.search(r'(PHA/\d{4}/\d{2})', line, re.IGNORECASE)
-                if match:
-                    matric_number = match.group(1).upper()
-                    data.append({
-                        'matric_number': matric_number,
-                        'class_name': 'Level 600'
-                    })
-                    # print(f"✅ Found: {matric_number}")
-                    break  # move to next row after finding a matric number
+            name = cells[0].text.strip()
+            voting_code = cells[1].text.strip().upper()
 
-    # print(f"FINAL DATA: {data}")
+            if voting_code:
+                data.append({
+                    'matric_number': voting_code,
+                    'class_name': 'Level 600'
+                })
+                print(f"Found Voting Code: {voting_code} (Name: {name})")
+
+    print(f"FINAL DATA COUNT: {len(data)}")
     return data
-
 
 
 def extract_voters_from_pdf(file_path):
