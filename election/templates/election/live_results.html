@@ -1,428 +1,500 @@
 {% extends 'election/base.html' %}
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12 d-flex justify-content-between align-items-center">
+
+<style>
+    :root {
+        --navy: #0f1c3f;
+        --blue: #1d4ed8;
+        --blue-lt: #dbeafe;
+        --ink: #1e293b;
+        --muted: #64748b;
+        --border: #e2e8f0;
+        --surface: #f8fafc;
+    }
+
+    /* ── Page header ── */
+    .results-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+
+    .results-header h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: .2rem;
+    }
+
+    .results-header p {
+        font-size: .88rem;
+        color: var(--muted);
+    }
+
+    /* ── Live badge ── */
+    .live-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        background: #dcfce7;
+        color: #15803d;
+        border-radius: 999px;
+        padding: .4rem .9rem;
+        font-size: .78rem;
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .live-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #16a34a;
+        animation: blink 1.8s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: .25;
+        }
+    }
+
+    /* ── Summary bar ── */
+    .summary-bar {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+
+    .stat-pill {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: .75rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        min-width: 160px;
+        flex: 1;
+    }
+
+    .stat-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .stat-icon.blue {
+        background: var(--blue-lt);
+        color: var(--blue);
+    }
+
+    .stat-icon.green {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .stat-num {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--ink);
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: .74rem;
+        color: var(--muted);
+        margin-top: .15rem;
+    }
+
+    /* ── Grid ── */
+    .portfolio-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1rem;
+    }
+
+    /* ── Portfolio card ── */
+    .p-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        transition: box-shadow .2s, transform .2s;
+    }
+
+    .p-card:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, .07);
+        transform: translateY(-2px);
+    }
+
+    .p-card-header {
+        background: var(--navy);
+        padding: 1rem 1.25rem .85rem;
+    }
+
+    .p-card-header .position-label {
+        font-size: .68rem;
+        font-weight: 600;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, .45);
+        margin-bottom: .3rem;
+    }
+
+    .p-card-header .position-name {
+        font-size: 1rem;
+        font-weight: 700;
+        color: white;
+        line-height: 1.25;
+    }
+
+    .p-card-body {
+        padding: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .vote-ring {
+        flex-shrink: 0;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--blue-lt);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .vote-ring .num {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--blue);
+        line-height: 1;
+    }
+
+    .vote-ring .unit {
+        font-size: .62rem;
+        font-weight: 600;
+        color: #93c5fd;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+    }
+
+    .vote-meta .label {
+        font-size: .78rem;
+        font-weight: 600;
+        color: var(--ink);
+    }
+
+    .vote-meta .sub {
+        font-size: .73rem;
+        color: var(--muted);
+        margin-top: .15rem;
+    }
+
+    .candidates-count {
+        display: inline-flex;
+        align-items: center;
+        gap: .25rem;
+        margin-top: .4rem;
+        font-size: .7rem;
+        font-weight: 600;
+        color: var(--muted);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: .2rem .5rem;
+    }
+
+    /* ── States ── */
+    .loading-state,
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--muted);
+    }
+
+    .loading-state .spinner-border {
+        width: 2.5rem;
+        height: 2.5rem;
+        color: var(--blue) !important;
+    }
+
+    /* ── Footer ── */
+    .refresh-row {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: .78rem;
+        color: var(--muted);
+    }
+
+    .refresh-row span {
+        font-weight: 600;
+        color: var(--ink);
+    }
+
+    /* ── Notice banner ── */
+    .notice {
+        background: #fefce8;
+        border: 1px solid #fde68a;
+        border-radius: 10px;
+        padding: .85rem 1.1rem;
+        font-size: .82rem;
+        color: #854d0e;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: .6rem;
+        line-height: 1.5;
+    }
+
+    /* ── Offline toast ── */
+    .offline-toast {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        background: white;
+        border: 1px solid #fca5a5;
+        border-left: 3px solid #dc2626;
+        border-radius: 10px;
+        padding: .85rem 1rem;
+        font-size: .82rem;
+        color: #7f1d1d;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, .12);
+        z-index: 9999;
+        max-width: 280px;
+        animation: slideUp .2s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<!-- ── Page header ── -->
+<div class="results-header">
+    <div>
+        <h1>Election Results</h1>
+        <p>Votes cast per position — updated every 30 seconds</p>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:.4rem;">
+        <span class="live-badge"><span class="live-dot"></span>Live</span>
+        <span style="font-size:.74rem; color:#94a3b8;">
+            Last updated <span id="last-updated" style="font-weight:600; color:#64748b;">—</span>
+        </span>
+    </div>
+</div>
+
+<!-- ── Notice ── -->
+<div class="notice">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0; margin-top:1px;">
+        <circle cx="12" cy="12" r="9.25" stroke="currentColor" stroke-width="1.5" />
+        <path d="M12 8v4M12 15.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+    <span>
+        Individual candidate tallies are withheld until the Electoral Commission formally declares results.
+        This page shows total participation per position only.
+    </span>
+</div>
+
+<!-- ── Summary stats ── -->
+<div class="summary-bar" id="summary-bar" style="display:none !important;">
+    <div class="stat-pill">
+        <div class="stat-icon blue">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5" />
+                <path d="M8 12h8M8 8h8M8 16h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+        </div>
         <div>
-            <h1 class="page-title mb-1">
-                <i class="fas fa-chart-line me-2"></i>Live Election Results
-            </h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Results</li>
-                </ol>
-            </nav>
+            <div class="stat-num" id="stat-positions">—</div>
+            <div class="stat-label">Positions</div>
         </div>
-        <div class="d-flex align-items-center">
-            <span class="badge bg-success px-3 py-2" id="live-indicator">
-                <i class="fas fa-circle me-1"></i> LIVE UPDATES
-            </span>
-            <div class="ms-3 text-end">
-                <small class="text-muted d-block">Last updated</small>
-                <span class="fw-bold" id="last-updated">--:--</span>
-            </div>
+    </div>
+    <div class="stat-pill">
+        <div class="stat-icon green">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                <circle cx="12" cy="12" r="9.25" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+        </div>
+        <div>
+            <div class="stat-num" id="stat-votes">—</div>
+            <div class="stat-label">Total votes cast</div>
         </div>
     </div>
 </div>
 
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card bg-light border-0 shadow-sm">
-            <div class="card-body py-3">
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <h5 class="mb-0"><i class="fas fa-info-circle text-primary me-2"></i> Real-time election results</h5>
-                    </div>
-                    <div class="col-md-6 text-md-end">
-                        <div class="btn-group btn-group-sm" role="group">
-                            <button type="button" class="btn btn-outline-primary active">All Positions</button>
-                            <button type="button" class="btn btn-outline-primary">Leading</button>
-                            <button type="button" class="btn btn-outline-primary">Close Races</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+<!-- ── Results grid ── -->
 <div id="results-container">
-    <!-- Results will be loaded here -->
-    <div class="text-center py-5 my-5">
-        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-            <span class="visually-hidden">Loading...</span>
+    <div class="loading-state">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading…</span>
         </div>
-        <h4 class="mt-3 text-primary">Loading election results</h4>
-        <p class="text-muted">Please wait while we fetch the latest data</p>
+        <p style="margin-top:1rem;">Loading results…</p>
     </div>
 </div>
 
-<!-- Template for portfolio results (used by JavaScript) -->
-<template id="portfolio-template">
-    <div class="row mb-4 portfolio-card">
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom">
-                    <div>
-                        <h3 class="mb-0 text-primary">
-                            <i class="fas fa-trophy me-2"></i>
-                            <span class="portfolio-name"></span>
-                        </h3>
-                        <small class="text-muted">
-                            <i class="fas fa-users me-1"></i> 
-                            <span class="candidate-count"></span> Candidates • 
-                            <i class="fas fa-vote-yea me-1"></i> 
-                            <span class="total-votes"></span> Total Votes
-                        </small>
-                    </div>
-                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
-                        <i class="fas fa-sync-alt me-1"></i> Auto-updating
-                    </span>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th style="width: 50px;">Rank</th>
-                                    <th>Candidate</th>
-                                    <th class="text-center">Votes</th>
-                                    <th class="text-center">Percentage</th>
-                                    <th style="width: 200px;">Progress</th>
-                                </tr>
-                            </thead>
-                            <tbody class="aspirants-list">
-                                <!-- Aspirants will be inserted here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
-                    <small class="text-muted">
-                        <i class="fas fa-clock me-1"></i>
-                        Last updated: <span class="portfolio-updated"></span>
-                    </small>
-                    <button class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-chart-pie me-1"></i> View Analytics
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
-
-<!-- Template for an aspirant result item (used by JavaScript) -->
-<template id="aspirant-template">
-    <tr class="aspirant-item">
-        <td class="text-center">
-            <span class="badge rank-badge rounded-circle d-inline-flex align-items-center justify-content-center"></span>
-        </td>
-        <td>
-            <div class="d-flex align-items-center">
-                <div class="position-relative me-3">
-                    <div class="candidate-face-container rounded-circle border border-2 border-white shadow-sm overflow-hidden" style="width: 60px; height: 60px;">
-                        <!-- Face will be inserted here -->
-                    </div>
-                </div>
-                <div>
-                    <h6 class="mb-0 fw-bold candidate-name"></h6>
-                    <small class="text-muted candidate-party" style="display: none;"></small>
-                </div>
-            </div>
-        </td>
-        <td class="text-center fw-bold vote-count"></td>
-        <td class="text-center">
-            <span class="badge vote-percentage rounded-pill py-2 px-3"></span>
-        </td>
-        <td>
-            <div class="progress" style="height: 10px;">
-                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-        </td>
-    </tr>
-</template>
-
-<!-- Empty state template -->
-<template id="empty-template">
-    <div class="row">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center py-5">
-                    <i class="fas fa-info-circle fa-4x text-muted mb-4"></i>
-                    <h3 class="text-muted">No Results Available</h3>
-                    <p class="text-muted mb-4">There are no election results to display at this time.</p>
-                    <button class="btn btn-primary" id="refresh-results">
-                        <i class="fas fa-sync-alt me-2"></i>Refresh
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
+<div class="refresh-row">
+    Auto-refreshes every <span>30 s</span> · <a href="#" id="refresh-now"
+        style="color:#1d4ed8; text-decoration:none; font-weight:600;">Refresh now</a>
+</div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const resultsContainer = document.getElementById('results-container');
-        const lastUpdatedEl = document.getElementById('last-updated');
-        const portfolioTemplate = document.getElementById('portfolio-template');
-        const aspirantTemplate = document.getElementById('aspirant-template');
-        const emptyTemplate = document.getElementById('empty-template');
-        const liveIndicator = document.getElementById('live-indicator');
-        
-        let updateInterval;
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('results-container');
+        const lastUpdEl = document.getElementById('last-updated');
+        const summaryBar = document.getElementById('summary-bar');
+        const statPos = document.getElementById('stat-positions');
+        const statVotes = document.getElementById('stat-votes');
         let lastData = null;
-        
-        // Function to format date
-        function formatDateTime(isoString) {
-            const date = new Date(isoString);
-            return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        let offlineToast = null;
+
+        function fmt(iso) {
+            return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
-        
-        // Create rank badge
-        function createRankBadge(rank) {
-            const badge = document.createElement('span');
-            badge.className = 'rank-badge d-inline-flex align-items-center justify-content-center';
-            
-            if (rank === 1) {
-                badge.className += ' bg-warning text-dark';
-                badge.innerHTML = '<i class="fas fa-crown"></i>';
-                badge.style = 'width: 30px; height: 30px;';
-            } else if (rank === 2) {
-                badge.className += ' bg-secondary text-white';
-                badge.textContent = rank;
-                badge.style = 'width: 28px; height: 28px;';
-            } else if (rank === 3) {
-                badge.className += ' bg-info text-white';
-                badge.textContent = rank;
-                badge.style = 'width: 26px; height: 26px;';
-            } else {
-                badge.className += ' bg-light text-dark';
-                badge.textContent = rank;
-                badge.style = 'width: 24px; height: 24px;';
-            }
-            
-            return badge;
+
+        // ── Render a single portfolio card showing total votes only ──────────
+        function renderCard(portfolio) {
+            const card = document.createElement('div');
+            card.className = 'p-card';
+            card.innerHTML = `
+            <div class="p-card-header">
+                <div class="position-label">Position</div>
+                <div class="position-name">${escHtml(portfolio.name)}</div>
+            </div>
+            <div class="p-card-body">
+                <div class="vote-ring">
+                    <div class="num">${portfolio.total_votes.toLocaleString()}</div>
+                    <div class="unit">votes</div>
+                </div>
+                <div class="vote-meta">
+                    <div class="label">${portfolio.total_votes === 1 ? 'Vote recorded' : 'Votes recorded'}</div>
+                    <div class="sub">Voting in progress</div>
+                    <div class="candidates-count">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4.25" stroke="currentColor" stroke-width="1.5"/><path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                        ${portfolio.aspirants.length} candidate${portfolio.aspirants.length !== 1 ? 's' : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+            return card;
         }
-        
-        // Create candidate face - ensures face is always visible
-        function createCandidateFace(imageUrl, candidateName) {
-            const container = document.createElement('div');
-            container.className = 'w-100 h-100';
-            
-            if (imageUrl) {
-                const img = document.createElement('img');
-                img.src = imageUrl;
-                img.alt = candidateName;
-                img.className = 'w-100 h-100 object-fit-cover';
-                img.style = 'object-position: top center;';
-                container.appendChild(img);
-            } else {
-                // Fallback with colored initial avatar
-                const initials = candidateName.split(' ').map(n => n[0]).join('').toUpperCase();
-                const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                
-                container.className += ' d-flex align-items-center justify-content-center text-white fw-bold';
-                container.style = `background-color: ${color}; font-size: 1.25rem;`;
-                container.textContent = initials.substring(0, 2);
-            }
-            
-            return container;
+
+        function escHtml(str) {
+            const d = document.createElement('div');
+            d.appendChild(document.createTextNode(str));
+            return d.innerHTML;
         }
-        
-        // Function to render a single aspirant
-        function renderAspirant(aspirant, rank, total) {
-            const template = aspirantTemplate.content.cloneNode(true);
-            const item = template.querySelector('.aspirant-item');
-            
-            // Set rank
-            const rankBadge = item.querySelector('.rank-badge');
-            rankBadge.parentNode.replaceChild(createRankBadge(rank), rankBadge);
-            
-            // Set aspirant details
-            item.querySelector('.candidate-name').textContent = aspirant.name;
-            
-            // Set votes and percentage
-            item.querySelector('.vote-count').textContent = aspirant.votes.toLocaleString();
-            
-            const percentageEl = item.querySelector('.vote-percentage');
-            percentageEl.textContent = `${aspirant.percentage}%`;
-            percentageEl.className = `badge vote-percentage rounded-pill py-2 px-3 ${rank === 1 ? 'bg-primary' : 'bg-secondary'}`;
-            
-            // Set progress bar
-            const progressBar = item.querySelector('.progress-bar');
-            progressBar.style.width = `${aspirant.percentage}%`;
-            progressBar.className = `progress-bar ${rank === 1 ? 'bg-primary' : 'bg-secondary'}`;
-            progressBar.setAttribute('aria-valuenow', aspirant.percentage);
-            
-            // Add candidate face (always visible)
-            const faceContainer = item.querySelector('.candidate-face-container');
-            faceContainer.appendChild(createCandidateFace(aspirant.image_url, aspirant.name));
-            
-            // Highlight the winner's row
-            if (rank === 1) {
-                item.classList.add('table-primary');
-            }
-            
-            return item;
-        }
-        
-        // Function to render a portfolio and its aspirants
-        function renderPortfolio(portfolio) {
-            const template = portfolioTemplate.content.cloneNode(true);
-            
-            // Set portfolio details
-            template.querySelector('.portfolio-name').textContent = portfolio.name;
-            template.querySelector('.total-votes').textContent = portfolio.total_votes.toLocaleString();
-            template.querySelector('.candidate-count').textContent = portfolio.aspirants.length;
-            template.querySelector('.portfolio-updated').textContent = formatDateTime(portfolio.last_updated);
-            
-            // Add aspirants
-            const aspirantsList = template.querySelector('.aspirants-list');
-            
-            if (portfolio.aspirants.length === 0) {
-                const emptyRow = document.createElement('tr');
-                emptyRow.innerHTML = `
-                    <td colspan="5" class="text-center py-4">
-                        <i class="fas fa-info-circle me-2 text-muted"></i> No candidates available for this position
-                    </td>
-                `;
-                aspirantsList.appendChild(emptyRow);
-            } else {
-                portfolio.aspirants.forEach((aspirant, index) => {
-                    const aspirantEl = renderAspirant(aspirant, index + 1, portfolio.total_votes);
-                    aspirantsList.appendChild(aspirantEl);
-                });
-            }
-            
-            return template;
-        }
-        
-        // Function to render all results
-        function renderResults(data) {
+
+        // ── Render all portfolios ─────────────────────────────────────────────
+        function render(data) {
             lastData = data;
-            resultsContainer.innerHTML = '';
-            
-            if (data.results.length === 0) {
-                resultsContainer.appendChild(emptyTemplate.content.cloneNode(true));
-                document.getElementById('refresh-results').addEventListener('click', fetchResults);
+            container.innerHTML = '';
+
+            if (!data.results || data.results.length === 0) {
+                container.innerHTML = `
+                <div class="empty-state">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" style="margin:0 auto .75rem; display:block; color:#cbd5e1;">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 5h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    <p style="font-weight:600; color:#475569;">No results to show yet</p>
+                    <p style="font-size:.82rem; margin-top:.25rem;">Voting may still be in progress.</p>
+                </div>`;
                 return;
             }
-            
-            data.results.forEach(portfolio => {
-                resultsContainer.appendChild(renderPortfolio(portfolio));
-            });
-            k
-            ,
-            
-            // Update last updated time
-            lastUpdatedEl.textContent = formatDateTime(data.last_updated);
-            
-            // Animate live indicator
-            liveIndicator.classList.add('pulse');
-            setTimeout(() => {
-                liveIndicator.classList.remove('pulse');
-            }, 1000);
+
+            // ── Summary stats ──────────────────────────────────────────────────
+            const totalVotes = data.results.reduce((s, p) => s + p.total_votes, 0);
+            statPos.textContent = data.results.length;
+            statVotes.textContent = totalVotes.toLocaleString();
+            summaryBar.style.removeProperty('display');
+
+            // ── Portfolio grid ─────────────────────────────────────────────────
+            const grid = document.createElement('div');
+            grid.className = 'portfolio-grid';
+            data.results.forEach(p => grid.appendChild(renderCard(p)));
+            container.appendChild(grid);
+
+            lastUpdEl.textContent = fmt(data.last_updated);
         }
-        
-        // Function to fetch results
+
+        // ── Offline toast ─────────────────────────────────────────────────────
+        function showOffline() {
+            if (offlineToast) return;
+            offlineToast = document.createElement('div');
+            offlineToast.className = 'offline-toast';
+            offlineToast.innerHTML = `
+            <strong style="display:block; margin-bottom:.2rem;">Connection issue</strong>
+            Showing last known results. Trying to reconnect…
+        `;
+            document.body.appendChild(offlineToast);
+            setTimeout(() => {
+                offlineToast?.remove();
+                offlineToast = null;
+            }, 5000);
+        }
+
+        // ── Fetch ─────────────────────────────────────────────────────────────
         function fetchResults() {
-            // Show loading state
-            resultsContainer.innerHTML = `
-                <div class="text-center py-5 my-5">
-                    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <h4 class="mt-3 text-primary">Loading election results</h4>
-                    <p class="text-muted">Please wait while we fetch the latest data</p>
-                </div>
-            `;
-            
             fetch('/api/live-results/')
-                .then(response => response.json())
-                .then(data => {
-                    renderResults(data);
+                .then(r => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    return r.json();
                 })
-                .catch(error => {
-                    console.error('Error fetching results:', error);
-                    
-                    // If we have previous data, continue showing it with offline warning
+                .then(render)
+                .catch(() => {
                     if (lastData) {
-                        renderResults(lastData);
-                        showOfflineWarning();
+                        render(lastData);
+                        showOffline();
                     } else {
-                        resultsContainer.innerHTML = `
-                            <div class="alert alert-danger">
-                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                Error loading results. Please check your connection and try again.
-                            </div>
-                        `;
+                        container.innerHTML = `
+                        <div class="empty-state">
+                            <p style="color:#dc2626; font-weight:600;">Could not load results</p>
+                            <p style="font-size:.82rem; margin-top:.25rem;">Check your connection and try again.</p>
+                        </div>`;
                     }
                 });
         }
-        
-        function showOfflineWarning() {
-            const toast = document.createElement('div');
-            toast.className = 'position-fixed bottom-0 end-0 p-3';
-            toast.style = 'z-index: 11';
-            toast.innerHTML = `
-                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="toast-header bg-danger text-white">
-                        <strong class="me-auto">Connection Issue</strong>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                    <div class="toast-body">
-                        <i class="fas fa-wifi-slash me-2"></i> Showing cached results. Trying to reconnect...
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.remove();
-            }, 5000);
-        }
-        
-        // Initial fetch and set up auto-refresh
+
         fetchResults();
-        updateInterval = setInterval(fetchResults, 30000); // Update every 30 seconds
-        
-        // Clean up when leaving page
-        window.addEventListener('beforeunload', () => {
-            clearInterval(updateInterval);
+        const interval = setInterval(fetchResults, 30000);
+
+        document.getElementById('refresh-now').addEventListener('click', e => {
+            e.preventDefault();
+            fetchResults();
         });
-        
-        // Add styles
-        const styleEl = document.createElement('style');
-        styleEl.textContent = `
-            @keyframes pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.05); }
-                100% { transform: scale(1); }
-            }
-            .pulse {
-                animation: pulse 0.5s ease;
-            }
-            .object-fit-cover {
-                object-fit: cover;
-            }
-            .portfolio-card {
-                transition: all 0.3s ease;
-            }
-            .portfolio-card:hover {
-                transform: translateY(-2px);
-            }
-            .candidate-face-container {
-                transition: all 0.3s ease;
-            }
-            .candidate-face-container:hover {
-                transform: scale(1.1);
-            }
-            .progress-bar {
-                transition: width 1s ease;
-            }
-        `;
-        document.head.appendChild(styleEl);
+
+        window.addEventListener('beforeunload', () => clearInterval(interval));
     });
 </script>
+
 {% endblock %}

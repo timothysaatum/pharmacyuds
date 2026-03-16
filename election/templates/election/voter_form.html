@@ -1,139 +1,513 @@
-{% extends 'election/base.html' %}
-{% load form_tags %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-5 col-md-8">
-        <div class="text-center mb-4">
-            <h1 class="page-title">
-                <i class="fas fa-user-check me-2"></i>Voter Verification
-            </h1>
-            <p class="text-muted">Please verify your identity before proceeding to vote</p>
-        </div>
-        
-        <div class="card shadow-lg border-0">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0 text-center">
-                    <i class="fas fa-id-card me-2"></i>Student Verification
-                </h4>
-            </div>
-            <div class="card-body p-4">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-                
-                <form method="post" novalidate class="needs-validation">
-                    {% csrf_token %}
-                    
-                    <div class="mb-4">
-                        <div class="form-floating">
-                            {{ form.class_group|add_class:"form-select" }}
-                            <label for="{{ form.class_group.id_for_label }}">
-                                <i class="fas fa-users me-1"></i>Class Group
-                            </label>
-                        </div>
-                        {% if form.class_group.errors %}
-                            <div class="invalid-feedback d-block">
-                                {% for error in form.class_group.errors %}
-                                    <p class="mb-0">{{ error }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        <div class="form-text text-muted">
-                            <i class="fas fa-info-circle me-1"></i>Select your current class group
-                        </div>
-                    </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Voter Verification — UDS Pharmacy Elections</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-                    <div class="mb-4">
-                        <div class="form-floating">
-                            {{ form.matric_number|add_class:"form-control" }}
-                            <label for="{{ form.matric_number.id_for_label }}">
-                                <i class="fas fa-id-badge me-1"></i>Matric Number
-                            </label>
-                        </div>
-                        {% if form.matric_number.errors %}
-                            <div class="invalid-feedback d-block">
-                                {% for error in form.matric_number.errors %}
-                                    <p class="mb-0">{{ error }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        <div class="form-text text-muted">
-                            <i class="fas fa-info-circle me-1"></i>Enter your university matriculation number
-                        </div>
-                    </div>
+        :root {
+            --navy: #0f1c3f;
+            --blue: #1d4ed8;
+            --blue-lt: #eff6ff;
+            --ink: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --white: #ffffff;
+            --red: #dc2626;
+            --green: #16a34a;
+        }
 
-                    <div class="d-grid gap-2">
-                        <button id="submitBtn" type="submit" class="btn btn-primary btn-lg" disabled>
-                            <span id="spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
-                            <i class="fas fa-arrow-right me-2"></i>Verify & Proceed to Vote
-                        </button>
-                    </div>
-                    
-                    <div class="text-center mt-4">
-                        <p class="text-muted">
-                            <i class="fas fa-shield-alt me-1"></i>
-                            Your information is securely encrypted
-                        </p>
-                    </div>
-                </form>
-            </div>
-        </div>
-        
-        <div class="text-center mt-4">
-            <a href="/" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
-            </a>
-        </div>
-    </div>
-</div>
+        body {
+            background: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            padding: 1.5rem 1rem;
+        }
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector("form");
-        const submitBtn = document.getElementById("submitBtn");
-        const spinner = document.getElementById("spinner");
-        const matricField = document.getElementById("{{ form.matric_number.id_for_label }}");
-        const classField = document.getElementById("{{ form.class_group.id_for_label }}");
-        
-        // Visualize form field focus states
-        const formFields = document.querySelectorAll('.form-control, .form-select');
-        formFields.forEach(field => {
-            field.addEventListener('focus', () => {
-                field.parentElement.classList.add('focus-within');
-            });
-            field.addEventListener('blur', () => {
-                field.parentElement.classList.remove('focus-within');
-            });
-        });
+        .wrap {
+            width: 100%;
+            max-width: 440px;
+        }
 
-        // Enable submit button when both fields have values
-        function checkFormValidity() {
-            if (matricField.value.trim() !== '' && classField.value !== '') {
-                submitBtn.removeAttribute("disabled");
-            } else {
-                submitBtn.setAttribute("disabled", true);
+        .alert {
+            border-radius: 10px;
+            padding: .85rem 1rem;
+            font-size: .88rem;
+            line-height: 1.5;
+            margin-bottom: .75rem;
+            display: flex;
+            align-items: flex-start;
+            gap: .6rem;
+            border: 1px solid transparent;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            color: #92400e;
+            border-color: #fde68a;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            color: #1e40af;
+            border-color: #bfdbfe;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            color: #166534;
+            border-color: #bbf7d0;
+        }
+
+        .alert-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            opacity: .5;
+            font-size: 1rem;
+            color: inherit;
+            padding: 0 0 0 .5rem;
+        }
+
+        .alert-close:hover {
+            opacity: .9;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 14px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .08), 0 8px 24px rgba(0, 0, 0, .06);
+            overflow: hidden;
+        }
+
+        .card-head {
+            background: var(--navy);
+            padding: 2rem 2rem 1.75rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .card-head::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #2563eb 0%, #60a5fa 50%, #2563eb 100%);
+        }
+
+        .institution {
+            font-size: .72rem;
+            font-weight: 600;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .5);
+            margin-bottom: .6rem;
+        }
+
+        .card-head h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .card-head p {
+            font-size: .82rem;
+            color: rgba(255, 255, 255, .6);
+            margin-top: .35rem;
+        }
+
+        .factors {
+            display: flex;
+            justify-content: center;
+            gap: .5rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: #f8fafc;
+            flex-wrap: wrap;
+        }
+
+        .factor {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--muted);
+        }
+
+        .factor-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--blue);
+        }
+
+        .factor-sep {
+            color: var(--border);
+        }
+
+        .card-body {
+            padding: 1.75rem 2rem;
+        }
+
+        .field {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: .8rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: .45rem;
+        }
+
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: .7rem .9rem;
+            border: 1.5px solid var(--border);
+            border-radius: 9px;
+            font-family: 'Outfit', sans-serif;
+            font-size: .92rem;
+            color: var(--ink);
+            background: var(--white);
+            transition: border-color .15s, box-shadow .15s;
+            outline: none;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, .1);
+        }
+
+        input.err {
+            border-color: var(--red);
+        }
+
+        .field-hint {
+            font-size: .74rem;
+            color: var(--muted);
+            margin-top: .35rem;
+        }
+
+        .field-error {
+            font-size: .74rem;
+            color: var(--red);
+            margin-top: .35rem;
+        }
+
+        #id_sms_token {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: .4rem;
+            text-align: center;
+            text-transform: uppercase;
+            color: var(--navy);
+        }
+
+        #id_sms_token::placeholder {
+            color: #cbd5e1;
+            font-weight: 400;
+            letter-spacing: .2rem;
+        }
+
+        .fp-row {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            font-size: .74rem;
+            color: var(--muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .fp-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #94a3b8;
+            transition: background .3s;
+            flex-shrink: 0;
+        }
+
+        .fp-dot.ready {
+            background: var(--green);
+        }
+
+        .fp-dot.partial {
+            background: #f59e0b;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: .85rem;
+            background: var(--navy);
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: .95rem;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: .02em;
+            transition: background .15s, box-shadow .15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .6rem;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background: #162d5e;
+            box-shadow: 0 4px 12px rgba(15, 28, 63, .25);
+        }
+
+        .btn-submit:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, .35);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
             }
         }
-        
-        matricField.addEventListener('input', checkFormValidity);
-        classField.addEventListener('change', checkFormValidity);
-        
-        // Initial check on page load
-        checkFormValidity();
 
-        // Handle form submission
-        if (form) {
-            form.addEventListener("submit", () => {
-                submitBtn.setAttribute("disabled", true);
-                spinner.classList.remove("d-none");
+        .security-note {
+            text-align: center;
+            font-size: .73rem;
+            color: var(--muted);
+            margin-top: 1.25rem;
+        }
+
+        .closed-body {
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+
+        .closed-body h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: .5rem;
+        }
+
+        .closed-body p {
+            font-size: .85rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+
+        {% for msg in messages %}
+        <div class="alert alert-{{ msg.tags|default:'info' }}" role="alert">
+            <span>{{ msg }}</span>
+            <button class="alert-close" onclick="this.parentElement.remove()" aria-label="Close">&#x2715;</button>
+        </div>
+        {% endfor %}
+
+        {% if election_closed %}
+        <div class="card">
+            <div class="card-head">
+                <p class="institution">UDS School of Pharmacy</p>
+                <h1>Dept. Elections</h1>
+            </div>
+            <div class="closed-body">
+                <h2>Voting is closed</h2>
+                <p>This election is not currently accepting votes.<br>Contact the election administrator for assistance.
+                </p>
+            </div>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-head">
+                <p class="institution">UDS School of Pharmacy</p>
+                <h1>Voter Verification</h1>
+                <p>Confirm your identity to access the ballot</p>
+            </div>
+            <div class="factors">
+                <span class="factor"><span class="factor-dot"></span>Student ID</span>
+                <span class="factor-sep">&middot;</span>
+                <span class="factor"><span class="factor-dot"></span>Email address</span>
+                <span class="factor-sep">&middot;</span>
+                <span class="factor"><span class="factor-dot"></span>6-digit token</span>
+            </div>
+            <div class="card-body">
+                <form id="verificationForm" method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="field">
+                        <label for="{{ form.matric_number.id_for_label }}">Student ID</label>
+                        <input type="text" id="{{ form.matric_number.id_for_label }}" name="matric_number"
+                            autocomplete="off" placeholder="e.g. PHA/0003/20"
+                            value="{{ form.matric_number.value|default:'' }}"
+                            class="{% if form.matric_number.errors %}err{% endif %}">
+                        {% if form.matric_number.errors %}
+                        <p class="field-error">{{ form.matric_number.errors|join:" " }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="field">
+                        <label for="{{ form.email.id_for_label }}">Email address</label>
+                        <input type="email" id="{{ form.email.id_for_label }}" name="email" autocomplete="off"
+                            autocapitalize="none" placeholder="your.name@uds.edu.gh"
+                            value="{{ form.email.value|default:'' }}" class="{% if form.email.errors %}err{% endif %}">
+                        {% if form.email.errors %}
+                        <p class="field-error">{{ form.email.errors|join:" " }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="field">
+                        <label for="{{ form.sms_token.id_for_label }}">Voting token</label>
+                        <input type="text" id="{{ form.sms_token.id_for_label }}" name="sms_token" maxlength="6"
+                            autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+                            placeholder="K4R7QX" inputmode="text" value="{{ form.sms_token.value|default:'' }}"
+                            class="{% if form.sms_token.errors %}err{% endif %}">
+                        {% if form.sms_token.errors %}
+                        <p class="field-error">{{ form.sms_token.errors|join:" " }}</p>
+                        {% endif %}
+                        <p class="field-hint">6-character code sent to your phone</p>
+                    </div>
+
+                    <input type="hidden" id="fp_canvas" name="fp_canvas">
+                    <input type="hidden" id="fp_wgl_vendor" name="fp_wgl_vendor">
+                    <input type="hidden" id="fp_wgl_render" name="fp_wgl_render">
+                    <input type="hidden" id="fp_screen" name="fp_screen">
+                    <input type="hidden" id="fp_tz" name="fp_tz">
+                    <input type="hidden" id="fp_lang" name="fp_lang">
+                    <input type="hidden" id="fp_platform" name="fp_platform">
+                    <input type="hidden" id="fp_ua_hash" name="fp_ua_hash">
+
+                    <div class="fp-row">
+                        <div class="fp-dot" id="fpDot"></div>
+                        <span id="fpText">Checking device&hellip;</span>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn-submit" disabled>
+                        <div class="spinner" id="spinner"></div>
+                        <span id="btnLabel">Verify &amp; Continue</span>
+                    </button>
+                </form>
+                <p class="security-note">&#x1F512; Your device signature is verified to prevent impersonation</p>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+    <script>
+        var tokenEl = document.getElementById('{{ form.sms_token.id_for_label }}');
+        var idEl = document.querySelector('[name="matric_number"]');
+        var emailEl = document.querySelector('[name="email"]');
+        var submitBtn = document.getElementById('submitBtn');
+
+        if (tokenEl) {
+            tokenEl.addEventListener('input', function () {
+                var c = this.selectionStart;
+                this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+                this.setSelectionRange(c, c);
             });
         }
-    });
-</script>
-{% endblock %}
+
+        function checkReady() {
+            if (!submitBtn) return;
+            submitBtn.disabled = !(
+                idEl && idEl.value.trim() &&
+                emailEl && emailEl.value.trim() &&
+                tokenEl && tokenEl.value.length === 6
+            );
+        }
+        if (idEl) idEl.addEventListener('input', checkReady);
+        if (emailEl) emailEl.addEventListener('input', checkReady);
+        if (tokenEl) tokenEl.addEventListener('input', checkReady);
+        checkReady();
+
+        var vForm = document.getElementById('verificationForm');
+        if (vForm) {
+            vForm.addEventListener('submit', function () {
+                if (submitBtn) submitBtn.disabled = true;
+                var sp = document.getElementById('spinner');
+                var lb = document.getElementById('btnLabel');
+                if (sp) sp.style.display = 'block';
+                if (lb) lb.textContent = 'Verifying\u2026';
+            });
+        }
+
+        function setFP(id, val) { var el = document.getElementById(id); if (el) el.value = val || ''; }
+
+        function sha256(text) {
+            return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
+                .then(function (buf) {
+                    return Array.from(new Uint8Array(buf)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+                });
+        }
+
+        function captureFingerprint() {
+            var promises = [];
+            try {
+                var c = document.createElement('canvas'); c.width = 200; c.height = 50;
+                var ctx = c.getContext('2d');
+                ctx.fillStyle = '#f0e0d0'; ctx.fillRect(0, 0, 200, 50);
+                ctx.fillStyle = '#123456'; ctx.font = '18px Arial'; ctx.fillText('UDS-election-fp', 10, 30);
+                ctx.strokeStyle = '#654321'; ctx.beginPath(); ctx.arc(150, 25, 15, 0, Math.PI * 2); ctx.stroke();
+                promises.push(sha256(c.toDataURL()).then(function (h) { setFP('fp_canvas', h); }));
+            } catch (e) { }
+            try {
+                var gl = document.createElement('canvas').getContext('webgl');
+                var ext = gl && gl.getExtension('WEBGL_debug_renderer_info');
+                if (ext) { setFP('fp_wgl_vendor', gl.getParameter(ext.UNMASKED_VENDOR_WEBGL)); setFP('fp_wgl_render', gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)); }
+            } catch (e) { }
+            setFP('fp_screen', screen.width + 'x' + screen.height + 'x' + screen.colorDepth + 'x' + devicePixelRatio);
+            setFP('fp_tz', Intl.DateTimeFormat().resolvedOptions().timeZone);
+            setFP('fp_lang', navigator.language);
+            setFP('fp_platform', navigator.platform);
+            promises.push(sha256(navigator.userAgent).then(function (h) { setFP('fp_ua_hash', h); }).catch(function () { }));
+            return Promise.all(promises);
+        }
+
+        captureFingerprint()
+            .then(function () { var d = document.getElementById('fpDot'), t = document.getElementById('fpText'); if (d) d.classList.add('ready'); if (t) t.textContent = 'Device verified'; })
+            .catch(function () { var d = document.getElementById('fpDot'), t = document.getElementById('fpText'); if (d) d.classList.add('partial'); if (t) t.textContent = 'Partial device info'; });
+    </script>
+</body>
+
+</html>

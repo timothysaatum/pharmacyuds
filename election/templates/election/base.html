@@ -2,208 +2,272 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Department Elections</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="{% static '/style.css' %}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
-            --primary-color: #4361ee;
-            --primary-dark: #3a56d4;
-            --secondary-color: #3a0ca3;
-            --accent-color: #4cc9f0;
-            --success-color: #2ec4b6;
-            --warning-color: #ff9f1c;
-            --danger-color: #e71d36;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
-            --gray-color: #6c757d;
-        }
-        
-        body {
-            background-color: #f0f2f5;
-            font-family: 'Inter', sans-serif;
-            color: #333;
-        }
-        
-        .navbar {
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-            padding: 0.8rem 1rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.4rem;
-            color: white !important;
-        }
-        
-        .nav-link {
-            color: rgba(255, 255, 255, 0.9) !important;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            transition: all 0.3s ease;
-            border-radius: 5px;
-            margin: 0 3px;
-        }
-        
-        .nav-link:hover, .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.15);
-            color: white !important;
-            transform: translateY(-1px);
-        }
-        
-        .card {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-        
-        .btn {
-            border-radius: 8px;
-            padding: 0.6rem 1.5rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-            border-color: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
-        }
-        
-        .btn-success {
-            background-color: var(--success-color);
-            border-color: var(--success-color);
-        }
-        
-        .btn-success:hover {
-            background-color: #25a599;
-            border-color: #25a599;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(46, 196, 182, 0.3);
-        }
-        
-        .page-title {
-            font-weight: 700;
-            color: var(--dark-color);
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.7rem;
-            border-bottom: 3px solid var(--primary-color);
-            display: inline-block;
-        }
-        
-        .form-control, .form-select {
-            border-radius: 8px;
-            padding: 0.7rem 1rem;
-            border: 1px solid #dee2e6;
+            --navy: #0f1c3f;
+            --navy-mid: #162d5e;
+            --blue: #1d4ed8;
+            --blue-lt: #eff6ff;
+            --ink: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --surface: #f8fafc;
+            --bg: #f1f5f9;
+            --success: #16a34a;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --radius: 12px;
         }
 
-        .form-floating > .form-control,
-        .form-floating > .form-select {
-            height: calc(3.5rem + 2px);
-            padding: 1rem 0.75rem;
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
         }
-        
-        .form-floating > label {
-            padding: 1rem 0.75rem;
+
+        body {
+            background-color: var(--bg);
+            font-family: 'Outfit', sans-serif;
+            color: var(--ink);
+            margin: 0;
         }
-        
-        .badge {
-            padding: 0.5em 0.8em;
+
+        /* ── Navbar ── */
+        .navbar {
+            background: var(--navy);
+            padding: .7rem 1rem;
+            border-bottom: 3px solid var(--blue);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white !important;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            letter-spacing: -.01em;
+        }
+
+        .navbar-brand .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, .12);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, .7) !important;
+            font-weight: 500;
+            font-size: .88rem;
+            padding: .45rem .85rem !important;
+            border-radius: 7px;
+            margin: 0 1px;
+            transition: color .15s, background .15s;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, .1);
+            color: white !important;
+        }
+
+        .navbar-toggler {
+            border-color: rgba(255, 255, 255, .2);
+        }
+
+        /* ── Content container ── */
+        .page-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.25rem;
+        }
+
+        /* ── Cards ── */
+        .card {
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
+            background: white;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            border-radius: 8px;
             font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            transition: all .15s;
         }
-        
-        .toast {
-            border-radius: 10px;
+
+        .btn-primary {
+            background: var(--blue);
+            border-color: var(--blue);
         }
-        
+
+        .btn-primary:hover {
+            background: #1a44c2;
+            border-color: #1a44c2;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background: #15803d;
+            border-color: #15803d;
+            transform: translateY(-1px);
+        }
+
+        /* ── Forms ── */
+        .form-control,
+        .form-select {
+            border-radius: 9px;
+            border-color: var(--border);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, .1);
+        }
+
+        /* ── Page title ── */
+        .page-title {
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 1.5rem;
+        }
+
+        /* ── Footer ── */
         .footer {
-            background-color: var(--light-color);
-            padding: 1.5rem 0;
+            background: white;
+            border-top: 1px solid var(--border);
+            padding: 1.25rem 0;
             margin-top: 3rem;
-            font-size: 0.9rem;
+            font-size: .82rem;
+            color: var(--muted);
         }
-        
-        /* Pulse Animation for Vote Button */
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(46, 196, 182, 0.4);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(46, 196, 182, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(46, 196, 182, 0);
-            }
+
+        /* ── Django messages → styled alerts ── */
+        .messages-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1.25rem;
         }
-        
-        .btn-pulse {
-            animation: pulse 2s infinite;
+
+        .messages-list li {
+            padding: .8rem 1rem;
+            border-radius: 9px;
+            font-size: .88rem;
+            margin-bottom: .5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: .6rem;
         }
-        
-        /* Page Transitions */
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
+
+        .messages-list .error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
         }
-        
+
+        .messages-list .warning {
+            background: #fffbeb;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .messages-list .info {
+            background: var(--blue-lt);
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .messages-list .success {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        /* ── Page transitions ── */
+        .page-container {
+            animation: fadeIn .35s ease;
+        }
+
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
+
 <body>
-    <!-- Modern Bootstrap Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="/">
-                <i class="fas fa-vote-yea me-2"></i>
+            <a class="navbar-brand" href="/">
+                <span class="brand-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 5h6"
+                            stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                        <path d="M9 12l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </span>
                 <span>Dept Elections</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav gap-1">
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">
-                            <i class="fas fa-home me-1"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if 'candidates' in request.path %}active{% endif %}" href="#">
-                            <i class="fas fa-users me-1"></i> Candidates
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor"
+                                    stroke-width="1.5" stroke-linejoin="round" />
+                            </svg>
+                            Home
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if 'results' in request.path %}active{% endif %}" href="/results">
-                            <i class="fas fa-chart-bar me-1"></i> Results
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-sign-out-alt me-1"></i> Logout
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                                <path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="1.5"
+                                    stroke-linecap="round" />
+                            </svg>
+                            Results
                         </a>
                     </li>
                 </ul>
@@ -211,68 +275,55 @@
         </div>
     </nav>
 
-    <!-- Page content -->
-    <div class="container mt-4 fade-in">
+    <div class="page-container">
+        {% if messages %}
+        <ul class="messages-list">
+            {% for msg in messages %}
+            <li class="{{ msg.tags|default:'info' }}">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex-shrink:0; margin-top:1px;">
+                    <circle cx="12" cy="12" r="9.25" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M12 8v4M12 15.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+                {{ msg }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
         {% block content %}{% endblock %}
     </div>
 
-    <!-- Toast Notifications -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div id="voteToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="fas fa-check-circle me-2"></i> Verification successful! Redirecting to vote...
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Footer -->
     <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <p class="mb-0">© 2025 Department Elections System</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="mb-0">Secure • Transparent • Reliable</p>
-                </div>
-            </div>
+        <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span>© 2025 UDS Department Elections System</span>
+            <span style="display:flex; align-items:center; gap:.4rem;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.5"
+                        stroke-linejoin="round" />
+                </svg>
+                Secure · Transparent · Reliable
+            </span>
         </div>
     </footer>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle form submissions with loading state
-            const form = document.querySelector("form");
-            const submitBtn = document.getElementById("submitBtn");
-            const spinner = document.getElementById("spinner");
-        
-            if (form && submitBtn) {
-                submitBtn.removeAttribute("disabled");
-        
-                form.addEventListener("submit", () => {
-                    submitBtn.setAttribute("disabled", true);
-                    if (spinner) {
-                        spinner.classList.remove("d-none");
-                    }
+        document.addEventListener('DOMContentLoaded', function () {
+            // Loading state on any form submission
+            document.querySelectorAll('form').forEach(form => {
+                const btn = form.querySelector('#submitBtn');
+                if (!btn) return;
+                form.addEventListener('submit', () => {
+                    btn.disabled = true;
                 });
-            }
-            
-            // Add pulse animation to main action buttons
-            const actionBtns = document.querySelectorAll('.btn-success');
-            actionBtns.forEach(btn => {
-                btn.classList.add('btn-pulse');
             });
-            
-            // Initialize all tooltips
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
+
+            // Bootstrap tooltips
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+                new bootstrap.Tooltip(el);
             });
         });
     </script>
 </body>
+
 </html>

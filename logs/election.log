@@ -1,0 +1,61 @@
+INFO 2026-03-15 19:32:25,830 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:32:51,316 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:33:34,913 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:33:48,308 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:34:58,553 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:34:59,414 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:35:57,300 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:36:34,767 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:36:35,616 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:55:02,303 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:55:50,015 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:56:58,408 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:56:59,318 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:57:12,036 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:57:21,317 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:57:28,208 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 19:57:29,111 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 20:37:07,726 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 20:37:33,211 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 20:54:22,707 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 21:03:47,240 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 21:04:17,980 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 21:12:59,320 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 21:16:18,262 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 21:23:12,967 utils Extracted 110 voters from Word document
+INFO 2026-03-15 21:23:23,956 utils Import done — created: 110, skipped/existing: 0
+INFO 2026-03-15 21:29:57,903 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 21:30:19,265 sms [DummySMS] Would send to 0555200366
+INFO 2026-03-15 21:30:19,270 sms [DummySMS] Would send to 0545907130
+INFO 2026-03-15 21:30:19,271 sms [DummySMS] Would send to 0556073286
+INFO 2026-03-15 21:30:19,501 sms [DummySMS] Would send to 0540689783
+INFO 2026-03-15 21:33:09,337 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 21:33:15,105 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 21:33:38,910 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 21:33:45,238 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+INFO 2026-03-15 21:34:50,521 utils pdfplumber not installed — PDF table extraction will use PyPDF2. Install pdfplumber for more reliable PDF imports: pip install pdfplumber
+WARNING 2026-03-15 21:42:40,862 views Verification: student not found id=PHA/0036/20 ip=127.0.0.1
+WARNING 2026-03-15 21:42:49,877 views Verification: student not found id=PHA/0036/20 ip=127.0.0.1
+INFO 2026-03-15 21:43:29,133 views Voter PHA/0036/20 verified ip=127.0.0.1
+INFO 2026-03-15 23:06:39,868 sms [DummySMS] Would send to 0548335306
+WARNING 2026-03-15 23:09:54,095 views FP duplicate: b0ad9bc71c78… prev=PHA/0036/20 now=PHA/0126/20
+INFO 2026-03-15 23:10:37,574 sms [DummySMS] Would send to 0545407201
+WARNING 2026-03-15 23:11:51,370 views FP duplicate: b0ad9bc71c78… prev=PHA/0036/20 now=PHA/0125/20
+INFO 2026-03-15 23:37:46,330 sms [DummySMS] Would send to 0559911369
+INFO 2026-03-15 23:39:08,886 views Voter PHA/0124/20 verified ip=127.0.0.1
+ERROR 2026-03-15 23:39:51,845 views FP mismatch PHA/0124/20: verify=a110886d163226e4… vote=c445a23cec27f34d…
+INFO 2026-03-16 06:34:55,829 sms [DummySMS] Would send to 0591891513
+WARNING 2026-03-16 06:36:39,112 views FP duplicate: b0ad9bc71c78… prev=PHA/0036/20 now=PHA/0123/20
+WARNING 2026-03-16 06:41:40,311 views Token reuse attempt: PHA/0123/20 ip=127.0.0.1
+WARNING 2026-03-16 06:45:43,078 views Token reuse attempt: PHA/0123/20 ip=127.0.0.1
+WARNING 2026-03-16 06:46:48,523 views Token reuse attempt: PHA/0123/20 ip=127.0.0.1
+WARNING 2026-03-16 06:47:06,790 views Token reuse attempt: PHA/0123/20 ip=127.0.0.1
+INFO 2026-03-16 06:50:56,438 sms [DummySMS] Would send to 0242843021
+WARNING 2026-03-16 06:52:08,291 views FP duplicate: b0ad9bc71c78… prev=PHA/0036/20 now=PHA/0122/20
+INFO 2026-03-16 07:00:01,948 sms [DummySMS] Would send to 0558228352
+WARNING 2026-03-16 07:01:12,341 views FP duplicate: b0ad9bc71c78… prev=PHA/0036/20 now=PHA/0121/20
+INFO 2026-03-16 07:03:24,939 utils Extracted 110 voters from Word document
+INFO 2026-03-16 07:03:38,424 utils Import done — created: 110, skipped/existing: 0
+INFO 2026-03-16 07:06:49,211 sms [DummySMS] Would send to 0545907130
+INFO 2026-03-16 07:09:58,732 views Voter PHA/0041/18 verified ip=127.0.0.1
+ERROR 2026-03-16 07:29:18,718 views FP mismatch PHA/0041/18: verify=b0ad9bc71c78748c… vote=c445a23cec27f34d…

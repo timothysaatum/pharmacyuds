@@ -2,260 +2,667 @@
 {% load form_tags %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="d-flex align-items-center justify-content-between">
-            <h1 class="page-title mb-0">
-                <i class="fas fa-vote-yea me-2"></i>Vote for Your Aspirants
-            </h1>
-            <div class="progress" style="width: 200px; height: 10px;">
-                <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-        </div>
-        <p class="text-muted mt-2">Review and select your preferred candidates</p>
-    </div>
-</div>
-
-<div class="row justify-content-center">
-    <div class="col-lg-10">
-        <div class="card shadow border-0">
-            <div class="card-header bg-primary text-white position-relative">
-                <h3 class="mb-0 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-ballot-check me-2"></i>
-                    <span>Cast Your Vote</span>
-                </h3>
-                <div class="position-absolute top-0 end-0 mt-2 me-3">
-                    <span class="badge bg-light text-primary">
-                        <i class="fas fa-user-shield me-1"></i> Anonymous
-                    </span>
-                </div>
-            </div>
-            <div class="card-body p-4">
-                <div class="alert alert-info d-flex align-items-center mb-4">
-                    <i class="fas fa-info-circle fs-5 me-3"></i>
-                    <div>
-                        <strong>How to vote:</strong> Select one candidate for each position below and submit your choices. 
-                        <span class="d-block mt-1"><i class="fas fa-exclamation-circle me-1"></i> You can't change your vote after submission.</span>
-                    </div>
-                </div>
-                
-                <form method="post" novalidate>
-                    {% csrf_token %}
-                    
-                    <div class="row g-4" id="votingCards">
-                        {% for field in form %}
-                            <div class="col-md-6">
-                                <div class="card shadow-sm h-100 position-relative border-0">
-                                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                                        <h5 class="mb-0 text-primary">
-                                            <i class="fas fa-user-tie me-2"></i>{{ field.label }}
-                                        </h5>
-                                        <span class="badge bg-primary rounded-pill">
-                                            {% if field.field.choices.0.0 == 'yes' %}
-                                                     1 candidate
-                                            {% else %}
-                                                {{ field.field.choices|length }} candidate{{ field.field.choices|pluralize }}
-                                            {% endif %}
-                                        </span>
-                                    </div>
-                                    <div class="card-body p-0">
-                                        <div class="aspirants-container p-3">
-                                            {% if field.field.choices.0.0 == 'yes' %}
-                                                <!-- Endorsement (Yes/No) for single aspirant -->
-                                                {% with candidate=field.field.choices.0.1 %}
-                                                <div class="text-center">
-                                                    <!-- Consistent face display -->
-                                                    <div class="candidate-face mb-3 mx-auto" style="width: 160px; height: 160px;">
-                                                        {% if candidate.image %}
-                                                            <img src="{{ candidate.image.url }}" 
-                                                                 class="img-fluid rounded-circle border border-4 border-primary object-fit-cover w-100 h-100" 
-                                                                 alt="{{ candidate.name }}"
-                                                                 style="object-position: top center;">
-                                                        {% else %}
-                                                            <div class="d-flex align-items-center justify-content-center w-100 h-100 rounded-circle border border-4 border-primary bg-light">
-                                                                <i class="fas fa-user fa-4x text-secondary"></i>
-                                                            </div>
-                                                        {% endif %}
-                                                    </div>
-                                                    
-                                                    <h4 class="mb-3">{{ candidate.name }}</h4>
-                                                    <p class="text-muted mb-4">{{ candidate.bio|default:"No description available"|truncatewords:20 }}</p>
-                                                    
-                                                    <!-- Improved endorsement toggle -->
-                                                    <div class="d-flex justify-content-center gap-3">
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" name="{{ field.name }}" value="yes" id="{{ field.name }}_yes" required>
-                                                            <label class="form-check-label btn btn-success px-4 py-2 rounded-pill" for="{{ field.name }}_yes">
-                                                                <i class="fas fa-thumbs-up me-2"></i>Endorse
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" name="{{ field.name }}" value="no" id="{{ field.name }}_no">
-                                                            <label class="form-check-label btn btn-outline-danger px-4 py-2 rounded-pill" for="{{ field.name }}_no">
-                                                                <i class="fas fa-thumbs-down me-2"></i>Decline
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                {% endwith %}
-                                            {% else %}
-                                                <!-- Standard candidate cards -->
-                                                <div class="row g-3">
-                                                    {% for choice in field.field.choices %}
-                                                    <div class="col-12">
-                                                        <input type="radio" name="{{ field.name }}" value="{{ choice.0 }}" 
-                                                               id="{{ field.name }}_{{ forloop.counter }}" 
-                                                               class="btn-check" 
-                                                               {% if field.value == choice.0 %}checked{% endif %} required>
-                                                        <label for="{{ field.name }}_{{ forloop.counter }}" 
-                                                               class="candidate-card w-100 btn p-0">
-                                                            <div class="card border-0 shadow-sm candidate-inner {% if field.value == choice.0 %}border-success border-2 bg-success-light{% endif %} h-100">
-                                                                <div class="row g-0 h-100">
-                                                                    <!-- Consistent face display -->
-                                                                    <div class="col-md-5 d-flex justify-content-center align-items-center p-3 bg-light">
-                                                                        <div class="candidate-face" style="width: 120px; height: 120px;">
-                                                                            {% if choice.1.image %}
-                                                                                <img src="{{ choice.1.image.url }}" 
-                                                                                     class="img-fluid rounded-circle border border-3 border-white shadow object-fit-cover w-100 h-100" 
-                                                                                     alt="{{ choice.1.name }}"
-                                                                                     style="object-position: top center;">
-                                                                            {% else %}
-                                                                                <div class="rounded-circle border border-3 border-white bg-white shadow d-flex align-items-center justify-content-center w-100 h-100">
-                                                                                    <i class="fas fa-user fa-3x text-secondary"></i>
-                                                                                </div>
-                                                                            {% endif %}
-                                                                        </div>
-                                                                    </div>
-                                                                    <!-- Candidate details -->
-                                                                    <div class="col-md-7 d-flex flex-column">
-                                                                        <div class="card-body">
-                                                                            <h5 class="card-title mb-1">{{ choice.1.name }}</h5>
-                                                                            <p class="card-text text-muted small mb-2">
-                                                                                {% if choice.1.party %}
-                                                                                    <span class="badge bg-primary bg-opacity-10 text-primary">{{ choice.1.party }}</span>
-                                                                                {% endif %}
-                                                                            </p>
-                                                                            <p class="card-text small text-muted mb-2">
-                                                                                {{ choice.1.bio|default:"No description available"|truncatewords:15 }}
-                                                                            </p>
-                                                                        </div>
-                                                                        <div class="card-footer bg-transparent border-0 pt-0 pb-3">
-                                                                            <div class="d-flex justify-content-between align-items-center">
-                                                                                <span class="badge rounded-pill bg-secondary">
-                                                                                    Candidate #{{ forloop.counter }}
-                                                                                </span>
-                                                                                <span class="badge {% if field.value == choice.0 %}bg-success{% else %}bg-light text-dark{% endif %} rounded-pill px-3 py-2">
-                                                                                    {% if field.value == choice.0 %}
-                                                                                        <i class="fas fa-check-circle me-1"></i> Selected
-                                                                                    {% else %}
-                                                                                        <i class="fas fa-hand-pointer me-1"></i> Select
-                                                                                    {% endif %}
-                                                                                </span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                    {% endfor %}
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-
-                    <div class="row mt-5">
-                        <div class="col-12">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <a href="#" class="btn btn-outline-secondary">
-                                    <i class="fas fa-arrow-left me-2"></i>Back to Review
-                                </a>
-                                <button type="submit" class="btn btn-success btn-lg px-5 py-3 rounded-pill shadow">
-                                    <i class="fas fa-paper-plane me-2"></i>Submit My Vote
-                                </button>
-                            </div>
-                            <div class="text-center mt-4">
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="confirmVote" required>
-                                    <label class="form-check-label small text-muted" for="confirmVote">
-                                        I confirm that my selections are final and I understand I cannot change my vote after submission
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 <style>
-    .bg-success-light {
-        background-color: rgba(25, 135, 84, 0.05) !important;
+    :root {
+        --navy: #0f1c3f;
+        --blue: #1d4ed8;
+        --blue-lt: #eff6ff;
+        --ink: #1e293b;
+        --muted: #64748b;
+        --border: #e2e8f0;
+        --surface: #f8fafc;
+        --green: #16a34a;
+        --green-lt: #f0fdf4;
     }
-    .candidate-card:hover .candidate-inner {
-        border-color: #0d6efd !important;
-        transform: translateY(-2px);
+
+    /* ── Layout ── */
+    .ballot-wrap {
+        max-width: 780px;
+        margin: 0 auto;
     }
-    .candidate-inner {
-        transition: all 0.2s ease;
+
+    /* ── Page heading ── */
+    .ballot-heading {
+        margin-bottom: 1.75rem;
     }
-    .object-fit-cover {
-        object-fit: cover;
+
+    .ballot-heading h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        margin-bottom: .3rem;
     }
-    .candidate-face {
+
+    .ballot-heading p {
+        font-size: .88rem;
+        color: var(--muted);
+    }
+
+    /* ── Instruction banner ── */
+    .instruction {
+        background: var(--blue-lt);
+        border: 1px solid #bfdbfe;
+        border-radius: 10px;
+        padding: .85rem 1.1rem;
+        font-size: .84rem;
+        color: #1e40af;
+        margin-bottom: 1.75rem;
+        display: flex;
+        align-items: flex-start;
+        gap: .65rem;
+        line-height: 1.5;
+    }
+
+    /* ── Portfolio section ── */
+    .portfolio-section {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 14px;
         overflow: hidden;
-        position: relative;
+        margin-bottom: 1.25rem;
+    }
+
+    .portfolio-section-head {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: .85rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .portfolio-section-head h3 {
+        font-size: .92rem;
+        font-weight: 700;
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin: 0;
+    }
+
+    .required-tag {
+        font-size: .68rem;
+        font-weight: 600;
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+        border-radius: 5px;
+        padding: .15rem .45rem;
+        letter-spacing: .02em;
+        text-transform: uppercase;
+    }
+
+    .selected-tag {
+        font-size: .7rem;
+        font-weight: 600;
+        background: var(--green-lt);
+        color: var(--green);
+        border: 1px solid #bbf7d0;
+        border-radius: 5px;
+        padding: .15rem .45rem;
+        display: none;
+        align-items: center;
+        gap: .3rem;
+    }
+
+    .portfolio-section-body {
+        padding: 1rem 1.25rem;
+    }
+
+    /* ── Candidate cards (multi-candidate) ── */
+    .candidates-list {
+        display: flex;
+        flex-direction: column;
+        gap: .6rem;
+    }
+
+    .candidate-radio {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .candidate-label {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        padding: 1.1rem 1.25rem;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: border-color .15s, background .15s, transform .1s;
+        background: white;
+        user-select: none;
+    }
+
+    .candidate-label:hover {
+        border-color: #93c5fd;
+        background: #f0f9ff;
+    }
+
+    .candidate-radio:checked+.candidate-label {
+        border-color: var(--blue);
+        background: var(--blue-lt);
+    }
+
+    /* ── Avatar ── */
+    .avatar {
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        border: 3px solid var(--border);
+        background: var(--surface);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: border-color .15s;
+    }
+
+    .candidate-radio:checked+.candidate-label .avatar {
+        border-color: var(--blue);
+    }
+
+    .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top;
+    }
+
+    .avatar svg {
+        color: #94a3b8;
+    }
+
+    .candidate-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .candidate-name {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--ink);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* ── Selection indicator ── */
+    .select-indicator {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: border-color .15s, background .15s;
+    }
+
+    .candidate-radio:checked+.candidate-label .select-indicator {
+        border-color: var(--blue);
+        background: var(--blue);
+    }
+
+    .select-indicator svg {
+        display: none;
+    }
+
+    .candidate-radio:checked+.candidate-label .select-indicator svg {
+        display: block;
+    }
+
+    /* ── Endorsement (single candidate) ── */
+    .endorse-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--surface);
+        border-radius: 10px;
+    }
+
+    .endorse-info {
+        flex: 1;
+    }
+
+    .endorse-info .name {
+        font-weight: 700;
+        font-size: .95rem;
+        color: var(--ink);
+    }
+
+    .endorse-btns {
+        display: flex;
+        gap: .6rem;
+    }
+
+    .endorse-btn {
+        flex: 1;
+        padding: .55rem 1rem;
+        border-radius: 8px;
+        border: 1.5px solid var(--border);
+        font-size: .82rem;
+        font-weight: 600;
+        cursor: pointer;
+        background: white;
+        color: var(--muted);
+        transition: all .15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .35rem;
+        min-width: 90px;
+    }
+
+    .endorse-input:checked[value="yes"]~.endorse-btns .endorse-yes,
+    .endorse-btn.yes.active {
+        background: var(--green-lt);
+        border-color: var(--green);
+        color: var(--green);
+    }
+
+    .endorse-input:checked[value="no"]~.endorse-btns .endorse-no,
+    .endorse-btn.no.active {
+        background: #fef2f2;
+        border-color: #dc2626;
+        color: #dc2626;
+    }
+
+    .endorse-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    /* ── Errors ── */
+    .field-error {
+        font-size: .78rem;
+        color: #dc2626;
+        margin-top: .5rem;
+        display: flex;
+        align-items: center;
+        gap: .3rem;
+    }
+
+    /* ── Submit section ── */
+    .submit-section {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .confirm-check {
+        display: flex;
+        align-items: flex-start;
+        gap: .75rem;
+        margin-bottom: 1.25rem;
+        padding: 1rem;
+        background: var(--surface);
+        border-radius: 10px;
+        border: 1px solid var(--border);
+    }
+
+    .confirm-check input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+        accent-color: var(--blue);
+        cursor: pointer;
+    }
+
+    .confirm-check label {
+        font-size: .83rem;
+        color: var(--ink);
+        line-height: 1.5;
+        cursor: pointer;
+    }
+
+    .progress-indicator {
+        font-size: .78rem;
+        color: var(--muted);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .progress-track {
+        height: 4px;
+        background: var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 1.25rem;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: var(--blue);
+        border-radius: 2px;
+        transition: width .4s ease;
+        width: 0%;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: .9rem;
+        background: var(--navy);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: .95rem;
+        font-weight: 600;
+        letter-spacing: .02em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .6rem;
+        transition: background .15s, transform .1s, box-shadow .15s;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+        background: #162d5e;
+        box-shadow: 0 4px 14px rgba(15, 28, 63, .3);
+    }
+
+    .btn-submit:active:not(:disabled) {
+        transform: scale(.99);
+    }
+
+    .btn-submit:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+    }
+
+    .spinner-sm {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, .3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin .7s linear infinite;
+        display: none;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
     }
 </style>
 
+<div class="ballot-wrap">
+
+    <div class="ballot-heading">
+        <h1>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 5h6"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+            Cast Your Vote
+        </h1>
+        <p>Select one candidate per position. Your vote is anonymous and cannot be changed after submission.</p>
+    </div>
+
+    <div class="instruction">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0; margin-top:1px;">
+            <circle cx="12" cy="12" r="9.25" stroke="currentColor" stroke-width="1.5" />
+            <path d="M12 8v4M12 15.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        <span>Make a selection for every position shown below, then confirm and submit at the bottom. You will not be
+            able to change your vote after submitting.</span>
+    </div>
+
+    <form id="voteForm" method="post" novalidate>
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="portfolio-section" data-field="{{ field.name }}">
+            <div class="portfolio-section-head">
+                <h3>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="8" r="4.25" stroke="currentColor" stroke-width="1.5" />
+                        <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" />
+                    </svg>
+                    {{ field.label }}
+                </h3>
+                <div style="display:flex; gap:.5rem; align-items:center;">
+                    <span class="selected-tag" id="sel-{{ field.name }}">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                            <path d="M5 12l5 5L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        Selected
+                    </span>
+                    <span class="required-tag" id="req-{{ field.name }}">Required</span>
+                </div>
+            </div>
+
+            <div class="portfolio-section-body">
+
+                {% if field.field.single_aspirant %}
+                {# ── Single-candidate endorsement ── #}
+                {% with single=field.field.single_aspirant %}
+                <div class="endorse-card">
+                    <div class="avatar">
+                        {% if single.image %}
+                        <img src="{{ single.image.url }}" alt="{{ single.name }}">
+                        {% else %}
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="8" r="4.25" stroke="currentColor" stroke-width="1.5" />
+                            <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" />
+                        </svg>
+                        {% endif %}
+                    </div>
+                    <div class="endorse-info">
+                        <div class="name">{{ single.name }}</div>
+                        <div style="font-size:.75rem; color:#94a3b8; margin-top:.15rem;">Single candidate</div>
+                    </div>
+                </div>
+                <div class="endorse-btns" style="margin-top:.75rem; display:flex; gap:.6rem;">
+                    <div style="flex:1;">
+                        <input type="radio" name="{{ field.name }}" value="yes" id="{{ field.name }}_yes"
+                            class="candidate-radio endorse-input" {% if field.value == 'yes' %}checked{% endif %}>
+                        <label for="{{ field.name }}_yes"
+                            class="endorse-btn yes {% if field.value == 'yes' %}active{% endif %}" style="width:100%;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                <path d="M7 13l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                            Endorse
+                        </label>
+                    </div>
+                    <div style="flex:1;">
+                        <input type="radio" name="{{ field.name }}" value="no" id="{{ field.name }}_no"
+                            class="candidate-radio endorse-input" {% if field.value == 'no' %}checked{% endif %}>
+                        <label for="{{ field.name }}_no"
+                            class="endorse-btn no {% if field.value == 'no' %}active{% endif %}" style="width:100%;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                            Decline
+                        </label>
+                    </div>
+                </div>
+                {% endwith %}
+
+                {% else %}
+                {# ── Multi-candidate selection ── #}
+                <div class="candidates-list">
+                    {% for aspirant in field.field.aspirants %}
+                    <div>
+                        <input type="radio" class="candidate-radio" name="{{ field.name }}" value="{{ aspirant.id }}"
+                            id="{{ field.name }}_{{ forloop.counter }}" {% if field.value == aspirant.id|stringformat:"s" %}checked{% endif %}>
+                        <label class="candidate-label" for="{{ field.name }}_{{ forloop.counter }}">
+                            <div class="avatar">
+                                {% if aspirant.image %}
+                                <img src="{{ aspirant.image.url }}" alt="{{ aspirant.name }}">
+                                {% else %}
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="8" r="4.25" stroke="currentColor" stroke-width="1.5" />
+                                    <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.5"
+                                        stroke-linecap="round" />
+                                </svg>
+                                {% endif %}
+                            </div>
+                            <div class="candidate-info">
+                                <div class="candidate-name">{{ aspirant.name }}</div>
+                            </div>
+                            <div class="select-indicator">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                    <path d="M5 12l5 5L19 7" stroke="white" stroke-width="2.5" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if field.errors %}
+                <p class="field-error">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                        <path
+                            d="M6 0a6 6 0 100 12A6 6 0 006 0zm0 9a.75.75 0 110 1.5A.75.75 0 016 9zm.75-6v4.5h-1.5V3h1.5z" />
+                    </svg>
+                    {{ field.errors|join:" " }}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- ── Submit ── -->
+        <div class="submit-section">
+            <div class="progress-indicator">
+                <span id="progress-text">0 of {{ form|length }} positions selected</span>
+                <span id="progress-pct" style="font-weight:600; color:#1d4ed8;">0%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+
+            <div class="confirm-check">
+                <input type="checkbox" id="confirmVote">
+                <label for="confirmVote">
+                    I confirm my selections are final. I understand I cannot change my vote after submitting.
+                </label>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn" disabled>
+                <div class="spinner-sm" id="spinner"></div>
+                <span id="btnLabel">Submit my vote</span>
+            </button>
+        </div>
+
+    </form>
+</div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Enhance radio button selection
-        const radioInputs = document.querySelectorAll('input[type="radio"]');
-        radioInputs.forEach(input => {
-            input.addEventListener('change', function() {
-                const name = this.name;
-                document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
-                    const card = radio.nextElementSibling?.querySelector('.candidate-inner');
-                    const badge = card?.querySelector('.badge');
-                    if (card && badge) {
-                        card.classList.remove('border-success', 'border-2', 'bg-success-light');
-                        badge.classList.remove('bg-success');
-                        badge.classList.add('bg-light', 'text-dark');
-                        badge.innerHTML = '<i class="fas fa-hand-pointer me-1"></i> Select';
-                    }
-                });
-                
-                const selectedCard = this.nextElementSibling?.querySelector('.candidate-inner');
-                const selectedBadge = selectedCard?.querySelector('.badge');
-                if (selectedCard && selectedBadge) {
-                    selectedCard.classList.add('border-success', 'border-2', 'bg-success-light');
-                    selectedBadge.classList.remove('bg-light', 'text-dark');
-                    selectedBadge.classList.add('bg-success');
-                    selectedBadge.innerHTML = '<i class="fas fa-check-circle me-1"></i> Selected';
-                }
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('voteForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const confirmBox = document.getElementById('confirmVote');
+        const progressFill = document.getElementById('progress-fill');
+        const progressTxt = document.getElementById('progress-text');
+        const progressPct = document.getElementById('progress-pct');
+        const sections = document.querySelectorAll('.portfolio-section');
+        const total = sections.length;
+
+        // Count unique field names to track progress
+        const fieldNames = [...new Set(
+            [...document.querySelectorAll('.candidate-radio')]
+                .map(r => r.name)
+        )];
+
+        function countSelected() {
+            return fieldNames.filter(name =>
+                document.querySelector(`[name="${name}"]:checked`)
+            ).length;
+        }
+
+        function updateProgress() {
+            const selected = countSelected();
+            const pct = total > 0 ? Math.round((selected / total) * 100) : 0;
+
+            progressFill.style.width = pct + '%';
+            progressTxt.textContent = `${selected} of ${total} position${total !== 1 ? 's' : ''} selected`;
+            progressPct.textContent = pct + '%';
+
+            submitBtn.disabled = !(selected === total && confirmBox.checked);
+        }
+
+        // ── Show/hide per-section "Selected" / "Required" tags ───────────────
+        function updateSectionTags() {
+            fieldNames.forEach(name => {
+                const checked = document.querySelector(`[name="${name}"]:checked`);
+                const selTag = document.getElementById(`sel-${name}`);
+                const reqTag = document.getElementById(`req-${name}`);
+                if (selTag) selTag.style.display = checked ? 'inline-flex' : 'none';
+                if (reqTag) reqTag.style.display = checked ? 'none' : 'inline-flex';
             });
-            
-            // Initialize checked states
-            if (input.checked) {
-                input.dispatchEvent(new Event('change'));
+        }
+
+        // ── Endorsement button visual toggle ────────────────────────────────
+        function updateEndorseBtns(name) {
+            const checked = document.querySelector(`[name="${name}"]:checked`);
+            const val = checked?.value;
+            const section = document.querySelector(`[data-field="${name}"]`);
+            if (!section) return;
+
+            section.querySelectorAll('.endorse-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (val === 'yes') {
+                section.querySelector('.endorse-btn.yes')?.classList.add('active');
+            } else if (val === 'no') {
+                section.querySelector('.endorse-btn.no')?.classList.add('active');
+            }
+        }
+
+        // ── Listen to all radio changes ──────────────────────────────────────
+        document.querySelectorAll('.candidate-radio').forEach(radio => {
+            radio.addEventListener('change', function () {
+                updateEndorseBtns(this.name);
+                updateSectionTags();
+                updateProgress();
+            });
+            // Init already-checked state (e.g. form re-render after error)
+            if (radio.checked) {
+                updateEndorseBtns(radio.name);
             }
         });
-        
-        // Add confirmation dialog
-        // const form = document.querySelector('form');
-        // form.addEventListener('submit', function(e) {
-        //     if (!document.getElementById('confirmVote').checked) {
-        //         e.preventDefault();
-        //         alert('Please confirm that your selections are final before submitting.');
-        //     }
-        // });
+
+        confirmBox.addEventListener('change', updateProgress);
+
+        // ── Loading state on submit ──────────────────────────────────────────
+        form.addEventListener('submit', function () {
+            submitBtn.disabled = true;
+            document.getElementById('spinner').style.display = 'block';
+            document.getElementById('btnLabel').textContent = 'Submitting…';
+        });
+
+        // ── Init ─────────────────────────────────────────────────────────────
+        updateSectionTags();
+        updateProgress();
     });
 </script>
+
 {% endblock %}
